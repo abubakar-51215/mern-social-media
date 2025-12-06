@@ -1,0 +1,27 @@
+.chat-bubble {
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 18px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.chat-bubble.sent {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.chat-bubble.received {
+    background-color: #f1f1f1;
+    color: #333;
+    margin-right: auto;
+    text-align: left;
+}
+
+.chat-bubble .timestamp {
+    font-size: 0.8em;
+    opacity: 0.7;
+    margin-top: 5px;
+}

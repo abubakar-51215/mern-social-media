@@ -1,0 +1,439 @@
+.sidebar {
+    width: 230px;
+    height: 100vh;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.logo-text {
+    background: linear-gradient(135deg, #4338ca 0%, #4338ca 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo:hover {
+    opacity: 0.8;
+}
+
+.logo-icon {
+    font-size: 24px;
+    background: linear-gradient(135deg, #fc8c43 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 0px 0;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin: 8px 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    margin: 0 12px;
+    text-decoration: none;
+    color: #6b7280;
+    transition: all 0.2s;
+    border-radius: 8px;
+    position: relative;
+    font-size: 15px;
+}
+
+.sidebar-nav a:hover {
+    background-color: #f3f4f6;
+}
+
+.sidebar-nav a.active {
+    background-color: #e0e7ff;
+    color: #6366f1;
+    font-weight: 600;
+}
+
+.nav-icon {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-label {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.create-post-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 20px;
+    background: #6366f1;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.create-post-btn:hover {
+    background: #5558e3;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.create-icon {
+    font-size: 20px;
+}
+
+.create-post-text {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* User Menu */
+.user-menu-container {
+    position: relative;
+}
+
+.user-profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.user-profile-trigger:hover {
+    background: #f7fafc;
+}
+
+.user-avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-avatar-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder-sidebar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.user-info-small {
+    flex: 1;
+    overflow: hidden;
+}
+
+.user-name-small {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-email-small {
+    font-size: 12px;
+    color: #718096;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-menu-dropdown {
+    position: fixed;
+    bottom: 80px;
+    left: 20px;
+    width: 420px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+    z-index: 999999;
+    animation: slideUpFade 0.2s ease;
+    isolation: isolate;
+}
+
+@keyframes slideUpFade {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user-menu-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.user-avatar-menu {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.user-avatar-menu img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder-menu {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.user-details-menu {
+    flex: 1;
+    overflow: hidden;
+}
+
+.user-name-menu {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 2px;
+}
+
+.user-email-menu {
+    font-size: 12px;
+    color: #65676b;
+}
+
+.user-menu-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+}
+
+.menu-action-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    flex: 1;
+    text-align: center;
+}
+
+.menu-action-item:hover {
+    background: #e5e7eb;
+    border-color: #d1d5db;
+}
+
+.menu-icon {
+    font-size: 14px;
+}
+
+.add-account-section {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.add-account-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 500;
+    width: 100%;
+}
+
+.add-account-btn:hover {
+    background: #f3f4f6;
+}
+
+.add-account-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #9ca3af;
+}
+
+.menu-divider {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 8px 0;
+}
+
+.menu-footer {
+    padding: 12px 16px;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+    background: #f9fafb;
+    border-radius: 0 0 12px 12px;
+}
+
+.clerk-badge {
+    font-size: 12px;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+.clerk-badge strong {
+    color: #2d3748;
+    font-weight: 600;
+}
+
+.dev-mode-badge {
+    font-size: 11px;
+    color: #f97316;
+    font-weight: 600;
+}
+
+.notification-badge {
+    position: absolute;
+    right: 20px;
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    animation: pulse-badge 2s infinite;
+}
+
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.sidebar-nav a.active .notification-badge {
+    background: white;
+    color: #ef4444;
+    animation: none;
+}
+
+.create-post-nav-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    margin-top: 8px;
+}
+
+.create-post-nav-btn:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8e 100%) !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(245, 87, 108, 0.7);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 4px rgba(245, 87, 108, 0);
+    }
+}

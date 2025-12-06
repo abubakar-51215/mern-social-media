@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='8' fill='%234338ca'/><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23fda746'/><stop offset='1' stop-color='%23f66c47'/></linearGradient></defs><path d='M21 8L12 20h10l-2 12 13-16H23l2-12z' fill='url(%23g)'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>PingUp - Social Media</title>
+    <script>
+        // Console filter - must be first
+        (function() {
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            const originalLog = console.log;
+            
+            const errorFilters = [
+                'ERR_BLOCKED_BY_CLIENT', 'Content Security Policy', 'googleads.g.doubleclick.net',
+                'doubleclick.net', 'ad_status.js', 'youtube.com/embed', 'Failed to load resource',
+                'www-embed-player.js', 'GET http://localhost:5000/api/friends/requests 404',
+                'Loading the script', 'violates the following Content Security Policy'
+            ];
+            
+            const warnFilters = ['[HMR]', 'Waiting for update signal', 'AdUnit', 'content-script.js', 'Document already loaded'];
+            
+            console.error = function(...args) {
+                const message = args.join(' ');
+                if (errorFilters.some(filter => message.includes(filter))) return;
+                originalError.apply(console, args);
+            };
+            
+            console.warn = function(...args) {
+                const message = args.join(' ');
+                if (warnFilters.some(filter => message.includes(filter))) return;
+                originalWarn.apply(console, args);
+            };
+            
+            console.log = function(...args) {
+                const message = args.join(' ');
+                if (message.includes('[HMR]') || message.includes('AdUnit')) return;
+                originalLog.apply(console, args);
+            };
+        })();
+        
+        // Polyfill for process in browser environment
+        window.process = window.process || { env: {} };
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

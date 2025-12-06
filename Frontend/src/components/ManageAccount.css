@@ -1,0 +1,573 @@
+/* Deprecated: replaced by ManageAccountRefined.css for the new Clerk-inspired layout. */
+.manage-account-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(248, 250, 252, 0.95);
+    backdrop-filter: blur(18px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.manage-account-modal {
+    background: #ffffff;
+    border-radius: 32px;
+    width: min(1120px, 100%);
+    max-height: 92vh;
+    box-shadow: 0 50px 120px rgba(15, 23, 42, 0.25);
+    position: relative;
+    animation: slideUp 0.3s ease;
+    overflow: hidden;
+    display: flex;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6b7280;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.close-modal-btn:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.manage-account-content {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 480px;
+    height: 100%;
+}
+
+.manage-account-sidebar {
+    padding: 32px 28px 24px;
+    background: linear-gradient(180deg, #f9f7ff 0%, #f0e5ff 45%, #fbf4f0 100%);
+    border-right: 1px solid #ececf2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.manage-account-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 4px 0;
+}
+
+.manage-account-header p {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 32px 0;
+    line-height: 1.4;
+}
+
+.manage-account-tabs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 14px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #6b7280;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    text-align: left;
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.tab-btn.active {
+    background: rgba(99, 102, 241, 0.18);
+    color: #0f172a;
+    font-weight: 600;
+    border-left-color: #6366f1;
+}
+
+.tab-icon {
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.tab-btn.active .tab-icon {
+    opacity: 1;
+}
+
+.manage-account-sidebar-footer {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.clerk-badge,
+.dev-mode-badge {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.clerk-badge {
+    color: #0f766e;
+    background: rgba(16, 185, 129, 0.12);
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.dev-mode-badge {
+    color: #c2410c;
+    background: rgba(248, 180, 85, 0.15);
+    padding: 6px 10px;
+    border-radius: 8px;
+}
+
+.manage-account-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+.manage-account-main-content {
+    flex: 1;
+    padding: 48px 48px 32px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+}
+
+.manage-account-main-content h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.tab-card {
+    background: #ffffff;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 35px 80px rgba(15, 23, 42, 0.12);
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    flex-direction: column;
+    padding: 32px;
+    max-height: calc(100% - 64px);
+}
+
+.tab-card-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.tab-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.profile-section,
+.security-section {
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 26px;
+}
+
+.profile-section label,
+.security-section label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.profile-section:last-of-type,
+.security-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.profile-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.profile-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.update-profile-btn {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.update-profile-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.email-item,
+.connected-account {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.email-address,
+.connected-email {
+    flex: 1;
+    font-size: 14px;
+    color: #111827;
+}
+
+.primary-badge {
+    padding: 4px 8px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.more-options-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.more-options-btn:hover {
+    background: #e5e7eb;
+}
+
+.add-email-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.add-email-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.google-icon {
+    width: 32px;
+    height: 32px;
+    background: #4285f4;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.security-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.security-item label {
+    margin: 0;
+    font-size: 14px;
+}
+
+.set-password-btn {
+    padding: 8px 16px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.set-password-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.device-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.device-icon {
+    font-size: 32px;
+}
+
+.device-info {
+    flex: 1;
+}
+
+.device-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.device-os {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.device-badge {
+    padding: 2px 8px;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.device-details {
+    font-size: 13px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.delete-section {
+    border-top: none;
+    padding-top: 0;
+}
+
+.delete-account-btn {
+    padding: 8px 16px;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #dc2626;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.delete-account-btn:hover {
+    background: #fecaca;
+    border-color: #fca5a5;
+}
+
+/* Password Modal */
+.password-modal-overlay,
+.delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.password-modal,
+.delete-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.password-modal h3,
+.delete-modal h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0 0 16px 0;
+}
+
+.delete-modal p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+.password-modal input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+.password-modal input:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-actions button:first-child {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.modal-actions button:first-child:hover {
+    background: #f9fafb;
+}
+
+.modal-actions button:last-child {
+    background: #6366f1;
+    border: none;
+    color: white;
+}
+
+.modal-actions button:last-child:hover {
+    background: #5558e3;
+}
+
+.delete-confirm-btn {
+    background: #dc2626 !important;
+}
+
+.delete-confirm-btn:hover {
+    background: #b91c1c !important;
+}

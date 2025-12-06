@@ -1,0 +1,283 @@
+.forward-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.forward-modal {
+  background: #262626;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.forward-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #363636;
+  position: relative;
+}
+
+.forward-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.close-btn {
+  position: absolute;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.forward-search {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #363636;
+  gap: 12px;
+}
+
+.search-label {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.forward-search input {
+  flex: 1;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #ffffff;
+  outline: none;
+}
+
+.forward-search input::placeholder {
+  color: #8e8e8e;
+}
+
+.forward-section-label {
+  padding: 16px 16px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.forward-conversations-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 350px;
+}
+
+.forward-conversations-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.forward-conversations-list::-webkit-scrollbar-track {
+  background: #262626;
+}
+
+.forward-conversations-list::-webkit-scrollbar-thumb {
+  background: #363636;
+  border-radius: 4px;
+}
+
+.loading-state,
+.empty-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #8e8e8e;
+  font-size: 14px;
+}
+
+.forward-conversation-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  gap: 12px;
+}
+
+.forward-conversation-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.forward-conversation-item.selected {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.conv-checkbox {
+  flex-shrink: 0;
+}
+
+.custom-radio {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #8e8e8e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.custom-radio.checked {
+  border-color: #0095f6;
+  background: #0095f6;
+}
+
+.radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.conv-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.conv-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.conv-avatar .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.conv-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.conv-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.conv-username {
+  font-size: 13px;
+  color: #8e8e8e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.forward-actions {
+  padding: 16px;
+}
+
+.send-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #0095f6;
+  color: white;
+}
+
+.send-btn:hover:not(:disabled) {
+  background: #1aa1f7;
+}
+
+.send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .forward-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .forward-header h3 {
+    font-size: 18px;
+  }
+
+  .conv-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+}

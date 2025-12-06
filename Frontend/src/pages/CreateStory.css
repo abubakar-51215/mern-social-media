@@ -1,0 +1,530 @@
+.create-story-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+.create-story-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.create-story-header h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.create-story-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 80px;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.story-canvas {
+  width: 100%;
+  max-width: 560px;
+  height: 480px;
+  border-radius: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.story-text-input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 28px;
+  font-weight: 400;
+  text-align: left;
+  resize: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.4;
+}
+
+.story-text-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 300;
+}
+
+.media-canvas {
+  background: #2a2a2a;
+}
+
+.story-media-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.media-placeholder {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 18px;
+}
+
+.color-picker {
+  display: flex;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+.color-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.color-btn:hover {
+  transform: scale(1.05);
+}
+
+.color-btn.active {
+  border-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.story-type-selector {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 16px 24px;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.type-btn:hover {
+  background: #f5f5f5;
+}
+
+.type-btn.active {
+  background: white;
+  color: #1a1a1a;
+  border: none;
+}
+
+.create-story-btn {
+  width: 100%;
+  max-width: 560px;
+  padding: 18px;
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.create-story-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+}
+
+.create-story-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Story Options */
+.story-options {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 560px;
+  flex-wrap: wrap;
+}
+
+.option-btn {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.option-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.option-btn.active {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+
+/* Music Search Panel */
+.music-search-panel,
+.mentions-panel {
+  width: 100%;
+  max-width: 560px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.music-search-input,
+.mention-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.music-search-input::placeholder,
+.mention-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.music-list,
+.friends-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.music-item,
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.music-item:hover,
+.friend-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.music-item.selected,
+.friend-item.selected {
+  background: rgba(99, 102, 241, 0.3);
+}
+
+.music-icon {
+  font-size: 24px;
+}
+
+.music-info {
+  flex: 1;
+}
+
+.track-name {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.artist-name {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.friend-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.friend-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.friend-name {
+  flex: 1;
+  font-size: 14px;
+}
+
+.check-icon {
+  color: #22c55e;
+  font-size: 18px;
+}
+
+.done-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 12px;
+  background: #6366f1;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Question Canvas */
+.question-canvas,
+.poll-canvas {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.question-container {
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.question-label {
+  display: block;
+  font-size: 18px;
+  opacity: 0.8;
+  margin-bottom: 20px;
+}
+
+.question-input {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  color: white;
+  font-size: 20px;
+  text-align: center;
+}
+
+.question-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Poll Canvas - Instagram Style */
+.poll-preview-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.poll-preview-box {
+  background: white;
+  border-radius: 16px;
+  width: 85%;
+  max-width: 300px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.poll-preview-question {
+  background: #262626;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 14px 18px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.poll-preview-options {
+  display: flex;
+  flex-direction: column;
+}
+
+.poll-preview-option {
+  padding: 14px 18px;
+  border-bottom: 1px solid #efefef;
+  color: #262626;
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.poll-preview-option:last-child {
+  border-bottom: none;
+}
+
+/* Poll Edit Section */
+.poll-edit-section {
+  width: 100%;
+  max-width: 560px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  margin-top: 20px;
+}
+
+.poll-question-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: #262626;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.poll-question-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.poll-options-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.poll-option-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: white;
+  border: 1px solid #efefef;
+  border-radius: 10px;
+  color: #262626;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.poll-option-input::placeholder {
+  color: #999;
+}
+
+.add-option-btn {
+  padding: 14px 18px;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.add-option-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+/* Music and Mentions Badges */
+.music-badge,
+.mentions-badge {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
+
+.mentions-badge {
+  bottom: 56px;
+}
+
+@media (max-width: 768px) {
+  .story-canvas {
+    max-width: 100%;
+    height: 400px;
+  }
+
+  .story-text-input {
+    font-size: 24px;
+  }
+
+  .story-type-selector {
+    flex-wrap: wrap;
+  }
+
+  .type-btn {
+    flex: 1 1 45%;
+  }
+}

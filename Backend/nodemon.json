@@ -1,0 +1,7 @@
+{
+  "verbose": false,
+  "quiet": true,
+  "events": {},
+  "ignore": ["node_modules", "*.test.js"],
+  "watch": ["*.js", "routes/**/*.js", "controllers/**/*.js", "models/**/*.js", "config/**/*.js", "middleware/**/*.js"]
+}
