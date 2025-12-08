@@ -5,10 +5,10 @@
 }
 
 .profile-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .profile-cover-gradient {
@@ -24,7 +24,7 @@
 .profile-avatar-large {
  
   border-radius: 50%;
-  border: 4px solid white;
+  border: 4px solid var(--card-bg);
   margin-top: 20px;
   background: #6366f1;
   color: white;
@@ -51,6 +51,11 @@
   justify-content: center;
 }
 
+.profile-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .btn-edit-profile {
   top: 16px;
   right: 32px;
@@ -67,6 +72,27 @@
 
 .btn-edit-profile:hover {
   background: #5558e3;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-qr-code {
+  width: 42px;
+  height: 42px;
+  background: var(--hover-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-qr-code:hover {
+  background: #6366f1;
+  border-color: #6366f1;
+  transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 

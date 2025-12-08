@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route, useHistory } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, useHistory, useLocation } from "react-router-dom";
 import { ToastContainer } from './components/Toast';
 
 import AuthPage from "./pages/AuthPage";
@@ -16,8 +16,10 @@ import HashtagPosts from "./pages/HashtagPosts";
 import Settings from "./pages/Settings";
 
 import Sidebar from "./components/Sidebar";
+import AIChatbot from "./components/AIChatbot";
 
 import "./App.css";
+import "./styles/darkMode.css";
 
 function PageLayout({ children }) {
   return (
@@ -44,10 +46,19 @@ function AuthListener({ children }) {
   return children;
 }
 
+// Chatbot wrapper to only show on dashboard page
+function ChatbotWrapper() {
+  const location = useLocation();
+  const isDashboard = location.pathname === '/dashboard';
+  
+  return isDashboard ? <AIChatbot /> : null;
+}
+
 function App() {
   return (
     <Router>
       <AuthListener>
+        <ChatbotWrapper />
         <Switch>
           {/* Auth Routes */}
           <Route path="/" exact component={AuthPage} />

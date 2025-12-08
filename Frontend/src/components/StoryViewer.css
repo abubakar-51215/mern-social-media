@@ -222,6 +222,80 @@
   right: 0;
 }
 
+/* Music Display in Story Viewer */
+.story-music-display {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 10;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 250px;
+  max-width: 350px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.story-music-display:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateX(-50%) scale(1.02);
+}
+
+.story-music-display .music-album-art {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.story-music-display .music-note {
+  font-size: 18px;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.story-music-display .music-note.playing {
+  animation: bounce 1s infinite;
+}
+
+.story-music-display .music-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.story-music-display .music-track {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.story-music-display .music-artist {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
 .story-actions {
   position: absolute;
   bottom: 80px;

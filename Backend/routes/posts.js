@@ -153,7 +153,17 @@ router.get("/hashtag/:tag", protect, async (req, res) => {
 router.post("/", protect, upload.array('images', 5), handleUploadError, async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id || req.user;
-    const { content, location } = req.body;
+    const { content, location, music } = req.body;
+    
+    // Parse music data if provided
+    let musicData = null;
+    if (music) {
+      try {
+        musicData = typeof music === 'string' ? JSON.parse(music) : music;
+      } catch (e) {
+        console.error('Error parsing music data:', e);
+      }
+    }
     
     // Get uploaded file paths
     const imagePaths = req.files ? req.files.map(file => `/uploads/posts/${file.filename}`) : [];
@@ -207,7 +217,8 @@ router.post("/", protect, upload.array('images', 5), handleUploadError, async (r
       images: imagePaths,
       location: location || '',
       hashtags: [...new Set(hashtags)],
-      mentions: mentionedUserIds
+      mentions: mentionedUserIds,
+      music: musicData
     });
     
     await post.save();
@@ -744,6 +755,47 @@ router.post("/:postId/share-to-story", protect, async (req, res) => {
     res.status(201).json(populatedStory);
   } catch (err) {
     console.error('Share to story error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get single post by ID (for sharing/preview) - Public route with optional auth
+router.get("/:postId", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+      .populate('user', 'name username email profilePicture')
+      .populate('likes', 'name username profilePicture')
+      .populate({
+        path: 'comments.user',
+        select: 'name username profilePicture'
+      });
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    // Return post data for preview/sharing
+    res.json({
+      id: post._id,
+      content: post.content,
+      images: post.images,
+      user: {
+        name: post.user.name,
+        username: post.user.username,
+        profilePicture: post.user.profilePicture
+      },
+      likesCount: post.likes.length,
+      commentsCount: post.comments.length,
+      createdAt: post.createdAt,
+      // Meta data for Open Graph previews
+      meta: {
+        title: `${post.user.name}'s post`,
+        description: post.content.substring(0, 160),
+        image: post.images?.[0] || post.user.profilePicture || '',
+        url: `${req.protocol}://${req.get('host')}/post/${post._id}`
+      }
+    });
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });

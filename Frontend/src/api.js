@@ -267,6 +267,10 @@ export const getPostLikes = async (postId) => {
   return await API.get(`/posts/${postId}/likes`);
 };
 
+export const getPostById = async (postId) => {
+  return await API.get(`/posts/${postId}`);
+};
+
 export const deletePost = async (postId) => {
   return await API.delete(`/posts/${postId}`);
 };
@@ -350,7 +354,16 @@ export const getPostsByHashtag = async (hashtag) => {
 
 // Story API functions
 export const createStory = async (storyData) => {
-  return await API.post('/stories', storyData);
+  const config = {};
+  
+  // If it's FormData, let browser set Content-Type with boundary
+  if (storyData instanceof FormData) {
+    config.headers = {
+      'Content-Type': 'multipart/form-data'
+    };
+  }
+  
+  return await API.post('/stories', storyData, config);
 };
 
 export const getStories = async () => {

@@ -1,0 +1,81 @@
+/* Dark Mode Variables - Instagram Style */
+:root {
+  /* Light Mode (Default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f5f5f5;
+  --bg-hover: #f0f0f0;
+  --text-primary: #262626;
+  --text-secondary: #8e8e8e;
+  --text-tertiary: #c7c7c7;
+  --border-color: #dbdbdb;
+  --border-light: #efefef;
+  --card-bg: #ffffff;
+  --input-bg: #fafafa;
+  --button-primary: #0095f6;
+  --button-hover: #1877f2;
+  --link-color: #0095f6;
+  --error-color: #ed4956;
+  --success-color: #10b981;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --modal-overlay: rgba(0, 0, 0, 0.65);
+}
+
+/* Dark Mode - Instagram Style */
+[data-theme="dark"] {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #121212;
+  --bg-hover: #1a1a1a;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a8a8a8;
+  --text-tertiary: #737373;
+  --border-color: #262626;
+  --border-light: #363636;
+  --card-bg: #000000;
+  --input-bg: #121212;
+  --button-primary: #0095f6;
+  --button-hover: #1877f2;
+  --link-color: #e0f1ff;
+  --error-color: #ed4956;
+  --success-color: #10b981;
+  --shadow: rgba(255, 255, 255, 0.05);
+  --modal-overlay: rgba(0, 0, 0, 0.85);
+}
+
+/* Apply theme to body */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode Toggle Button */
+.theme-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--button-primary);
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle:hover {
+  background: var(--button-hover);
+  transform: scale(1.1);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}

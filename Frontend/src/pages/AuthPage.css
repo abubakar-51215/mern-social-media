@@ -16,13 +16,14 @@ body, html, #root {
 
 .auth-page {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px 80px;
   box-sizing: border-box;
   position: relative;
+  overflow: hidden;
   background: linear-gradient(135deg, 
     #e0f7ff 0%, 
     #f0e6ff 25%, 
@@ -163,6 +164,7 @@ body, html, #root {
 /* RIGHT CARD */
 .auth-right {
   width: 450px;
+  max-height: 85vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,26 +173,45 @@ body, html, #root {
 
 .auth-form-container {
   width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
   background: #fff;
   border-radius: 14px;
   box-shadow: 0 20px 60px rgba(75, 34, 246, 0.12);
-  padding: 24px 28px 24px 28px;
+  padding: 12px 24px 12px 24px;
   box-sizing: border-box;
   position: relative;
 }
 
+.auth-form-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-form-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-form-container::-webkit-scrollbar-thumb {
+  background: rgba(75, 34, 246, 0.2);
+  border-radius: 3px;
+}
+
+.auth-form-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 34, 246, 0.3);
+}
+
 .auth-header h2{
-  margin: 0 0 4px;
-  font-size: 20px;
+  margin: 0 0 2px;
+  font-size: 17px;
   text-align: center;
   font-weight: 700;
   color: #1a1a2e;
 }
 .auth-header p{
-  margin: 0 0 18px;
+  margin: 0 0 10px;
   text-align: center;
   color: #8b8b95;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 400;
 }
 
@@ -199,15 +220,15 @@ body, html, #root {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   justify-content: center;
-  height: 44px;
+  height: 36px;
   background: #fff;
   border-radius: 8px;
   border: 1px solid #e0e0e8;
   cursor: pointer;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 12px;
   color: #2a2a3a;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
@@ -228,10 +249,10 @@ body, html, #root {
 .divider{
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 14px 0;
+  gap: 10px;
+  margin: 12px 0;
   color: #9a9aa6;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
 }
 .divider:before, 
@@ -254,16 +275,16 @@ body, html, #root {
 }
 .form-group label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: #3a3a4a;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
   font-weight: 600;
 }
 .form-group input{
   width: 100%;
-  height: 42px;
-  padding: 10px 12px;
-  font-size: 13px;
+  height: 36px;
+  padding: 7px 12px;
+  font-size: 12px;
   border-radius: 8px;
   border: 1px solid #e0e0e8;
   outline: none;
@@ -287,14 +308,14 @@ body, html, #root {
 
 /* Continue button */
 .continue-btn{
-  margin-top: 4px;
-  height: 42px;
+  margin-top: 10px;
+  height: 36px;
   border-radius: 8px;
   cursor: pointer;
   background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
   color: #fff;
   font-weight: 700;
-  font-size: 13px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,8 +331,8 @@ body, html, #root {
 /* Auth switch */
 .auth-switch {
   text-align: center;
-  margin-top: 14px;
-  font-size: 12px;
+  margin-top: 12px;
+  font-size: 10px;
   color: #6b6b7a;
 }
 .auth-switch p{
@@ -333,10 +354,10 @@ body, html, #root {
 
 /* Footer */
 .auth-footer {
-  margin-top: 14px;
+  margin-top: 8px;
   text-align: center;
   color: #9a9aa6;
-  font-size: 11px;
+  font-size: 9px;
   display: flex;
   flex-direction: column;
   gap: 3px;

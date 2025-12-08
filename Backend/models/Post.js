@@ -36,6 +36,16 @@ const PostSchema = new mongoose.Schema({
   }],
   shares: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   saves: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  music: {
+    title: String,
+    artist: String,
+    album: String,
+    duration: Number,
+    previewUrl: String,
+    albumArt: String,
+    trackName: String,
+    artistName: String
+  },
   isEdited: { type: Boolean, default: false },
   editedAt: { type: Date }
 }, { timestamps: true });

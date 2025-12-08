@@ -112,8 +112,8 @@
 }
 
 .enhanced-message.own .message-bubble {
-  background: #dcf8c6;
-  color: #000;
+  background: #d9fdd3 !important;
+  color: #000 !important;
   border-bottom-right-radius: 2px;
 }
 

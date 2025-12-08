@@ -1,7 +1,7 @@
 .dashboard {
   display: flex;
   min-height: 100vh;
-  background: #f9fafb;
+  background: var(--bg-primary);
 }
 
 .dashboard-header {
@@ -10,8 +10,8 @@
   left: 230px;
   right: 0;
   height: 64px;
-  background: white;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,17 +30,18 @@
 .search-bar input {
   width: 100%;
   padding: 10px 20px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   border-radius: 24px;
-  background: #f9fafb;
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
   transition: all 0.2s;
 }
 
 .search-bar input:focus {
-  background: white;
-  border-color: #6366f1;
+  background: var(--bg-secondary);
+  border-color: var(--button-primary);
 }
 
 .search-dropdown {

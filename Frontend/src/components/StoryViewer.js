@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { toast } from './Toast';
 import { deleteStory, addStoryReaction, replyToStory, viewStory, votePoll, answerQuestion, getStoryViews } from '../api';
@@ -20,6 +20,8 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
   const [showViewers, setShowViewers] = useState(false);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
+  const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const audioRef = useRef(null);
 
   const currentStory = stories[currentStoryIndex];
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -29,6 +31,50 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
   
   const STORY_DURATION = 5000; // 5 seconds per story
   const reactionEmojis = ['❤️', '😂', '😮', '😢', '😡', '👏', '🔥', '🎉'];
+
+  // Music playback functions
+  const playMusic = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsMusicPlaying(true))
+        .catch(err => console.log('Music play failed:', err));
+    }
+  }, []);
+
+  const pauseMusic = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsMusicPlaying(false);
+    }
+  }, []);
+
+  const toggleMusic = useCallback(() => {
+    if (isMusicPlaying) {
+      pauseMusic();
+    } else {
+      playMusic();
+    }
+  }, [isMusicPlaying, playMusic, pauseMusic]);
+
+  // Auto-play music when story changes
+  useEffect(() => {
+    if (currentStory?.music?.previewUrl) {
+      // Stop any currently playing music
+      pauseMusic();
+      
+      // Start new music after a brief delay
+      const timer = setTimeout(() => {
+        playMusic();
+      }, 300);
+
+      return () => {
+        clearTimeout(timer);
+        pauseMusic();
+      };
+    } else {
+      pauseMusic();
+    }
+  }, [currentStoryIndex, currentStory, playMusic, pauseMusic]);
 
   // Reset poll/question state when story changes
   useEffect(() => {
@@ -413,6 +459,34 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
             >
               <p>{currentStory.text || 'Story'}</p>
             </div>
+          )}
+
+          {/* Music Badge - Instagram Style */}
+          {currentStory?.music && (
+            <>
+              <div className="story-music-display" onClick={toggleMusic}>
+                {currentStory.music.albumArt && (
+                  <img 
+                    src={currentStory.music.albumArt} 
+                    alt="Album" 
+                    className="music-album-art"
+                  />
+                )}
+                <div className="music-info">
+                  <span className="music-track">{currentStory.music.trackName || currentStory.music.title || 'Unknown Track'}</span>
+                  <span className="music-artist">{currentStory.music.artistName || currentStory.music.artist || 'Unknown Artist'}</span>
+                </div>
+                <span className={`music-note ${isMusicPlaying ? 'playing' : ''}`}>
+                  {isMusicPlaying ? '⏸' : '▶️'}
+                </span>
+              </div>
+              <audio 
+                ref={audioRef}
+                src={currentStory.music.previewUrl}
+                loop
+                preload="auto"
+              />
+            </>
           )}
 
           {/* Navigation areas */}

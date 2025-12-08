@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { getUser } from '../utils/auth';
 import API from '../api';
 import Sidebar from '../components/Sidebar';
+import MusicPicker from '../components/MusicPicker';
 import './CreatePost.css';
 
 const CreatePost = () => {
@@ -11,8 +12,12 @@ const CreatePost = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [user, setUser] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showMusicPicker, setShowMusicPicker] = useState(false);
+    const [selectedMusic, setSelectedMusic] = useState(null);
     const fileInputRef = useRef(null);
     const history = useHistory();
+    
+    const MAX_CHARS = 1000;
 
     useEffect(() => {
         const userData = getUser();
@@ -55,6 +60,31 @@ const CreatePost = () => {
         }
     };
 
+    const handleMusicSelect = (music) => {
+        setSelectedMusic(music);
+        setShowMusicPicker(false);
+    };
+
+    const handleRemoveMusic = () => {
+        setSelectedMusic(null);
+    };
+
+    // Helper function to convert duration from MM:SS to seconds
+    const parseDuration = (duration) => {
+        if (typeof duration === 'number') return duration;
+        if (!duration) return 0;
+        
+        // If it's in MM:SS format
+        if (typeof duration === 'string' && duration.includes(':')) {
+            const parts = duration.split(':');
+            const minutes = parseInt(parts[0]) || 0;
+            const seconds = parseInt(parts[1]) || 0;
+            return minutes * 60 + seconds;
+        }
+        
+        return parseInt(duration) || 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -68,6 +98,14 @@ const CreatePost = () => {
         try {
             const formData = new FormData();
             formData.append('content', content.trim() || ' ');
+            
+            // Append music data if selected
+            if (selectedMusic) {
+                formData.append('music', JSON.stringify({
+                    ...selectedMusic,
+                    duration: parseDuration(selectedMusic.duration)
+                }));
+            }
             
             // Append all selected images
             selectedFiles.forEach((file) => {
@@ -117,9 +155,22 @@ const CreatePost = () => {
                             className="post-textarea"
                             placeholder="What's happening?"
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={(e) => {
+                                if (e.target.value.length <= MAX_CHARS) {
+                                    setContent(e.target.value);
+                                }
+                            }}
                             rows={6}
+                            maxLength={MAX_CHARS}
                         />
+                        <div className="character-counter" style={{
+                            textAlign: 'right',
+                            fontSize: '14px',
+                            marginTop: '8px',
+                            color: content.length > MAX_CHARS * 0.9 ? '#ed4956' : 'var(--text-secondary, #8e8e8e)'
+                        }}>
+                            {content.length}/{MAX_CHARS}
+                        </div>
 
                         {imagePreview.length > 0 && (
                             <div className="image-preview-grid">
@@ -135,6 +186,26 @@ const CreatePost = () => {
                                         </button>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+
+                        {selectedMusic && (
+                            <div className="selected-music-preview">
+                                <div className="music-icon-wrapper">
+                                    <span className="music-note-icon">🎵</span>
+                                </div>
+                                <div className="music-info">
+                                    <div className="music-title">{selectedMusic.title}</div>
+                                    <div className="music-artist">{selectedMusic.artist}</div>
+                                </div>
+                                <button 
+                                    type="button" 
+                                    className="remove-music-btn"
+                                    onClick={handleRemoveMusic}
+                                    title="Remove music"
+                                >
+                                    ✕
+                                </button>
                             </div>
                         )}
 
@@ -156,6 +227,14 @@ const CreatePost = () => {
                                 >
                                     🖼️ {selectedFiles.length > 0 && `(${selectedFiles.length})`}
                                 </button>
+                                <button
+                                    type="button"
+                                    className="tool-btn"
+                                    onClick={() => setShowMusicPicker(true)}
+                                    title="Add music"
+                                >
+                                    🎵 {selectedMusic && '✓'}
+                                </button>
                             </div>
 
                             <button 
@@ -169,6 +248,13 @@ const CreatePost = () => {
                     </form>
                 </div>
             </div>
+            
+            {showMusicPicker && (
+                <MusicPicker 
+                    onSelect={handleMusicSelect}
+                    onClose={() => setShowMusicPicker(false)}
+                />
+            )}
         </div>
     );
 };

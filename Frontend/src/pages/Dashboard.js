@@ -250,8 +250,17 @@ What's your favorite JS feature?`,
               id: story._id,
               user: group.user.name,
               userId: group.user._id,
-              avatar: group.user.profilePicture,
+              avatar: group.user.profilePicture ? 
+                (group.user.profilePicture.startsWith('/uploads') 
+                  ? `http://localhost:5000${group.user.profilePicture}` 
+                  : group.user.profilePicture)
+                : null,
               image: story.content?.mediaUrl ? 
+                (story.content.mediaUrl.startsWith('/uploads') 
+                  ? `http://localhost:5000${story.content.mediaUrl}` 
+                  : story.content.mediaUrl) 
+                : null,
+              media: story.content?.mediaUrl ? 
                 (story.content.mediaUrl.startsWith('/uploads') 
                   ? `http://localhost:5000${story.content.mediaUrl}` 
                   : story.content.mediaUrl) 
@@ -262,6 +271,15 @@ What's your favorite JS feature?`,
               type: story.type,
               question: story.question || null,
               poll: story.poll || null,
+              music: story.music ? {
+                trackName: story.music.trackName,
+                artistName: story.music.artistName,
+                previewUrl: story.music.previewUrl,
+                albumArt: story.music.albumArt,
+                duration: story.music.duration,
+                title: story.music.trackName,
+                artist: story.music.artistName
+              } : null,
               views: story.views?.length || 0,
               reactions: story.reactions || [],
               replies: story.replies || []

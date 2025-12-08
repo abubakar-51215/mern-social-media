@@ -39,6 +39,11 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
     const [likesUsers, setLikesUsers] = useState([]);
     const [loadingLikes, setLoadingLikes] = useState(false);
     const shareMenuRef = useRef(null);
+    
+    // Music player state
+    const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+    const audioRef = useRef(null);
+    const postRef = useRef(null);
 
     // Check if post ID is a valid MongoDB ObjectId (24 hex characters)
     const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
@@ -82,6 +87,118 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
             window.removeEventListener('profileUpdated', handleProfileUpdate);
         };
     }, []);
+
+    // Music playback functions
+    const playMusic = React.useCallback(() => {
+        const musicUrl = post.music?.previewUrl || post.music?.preview_url;
+        console.log('playMusic called for post:', post._id, 'musicUrl:', musicUrl);
+        
+        if (!musicUrl) {
+            console.log('No music URL available');
+            return;
+        }
+
+        try {
+            if (!audioRef.current) {
+                console.log('Creating new Audio element');
+                audioRef.current = new Audio(musicUrl);
+                audioRef.current.loop = true;
+                audioRef.current.volume = 0.7; // Set volume to 70%
+                
+                // Add event listeners for debugging
+                audioRef.current.addEventListener('play', () => {
+                    console.log('Audio started playing');
+                    setIsMusicPlaying(true);
+                });
+                audioRef.current.addEventListener('pause', () => {
+                    console.log('Audio paused');
+                    setIsMusicPlaying(false);
+                });
+                audioRef.current.addEventListener('error', (e) => {
+                    console.error('Audio error:', e);
+                });
+            }
+            
+            console.log('Attempting to play audio');
+            audioRef.current.play()
+                .then(() => {
+                    console.log('Audio play promise resolved');
+                    setIsMusicPlaying(true);
+                })
+                .catch(err => {
+                    console.warn('Auto-play prevented by browser:', err.message);
+                    // Show a small indicator that user needs to interact
+                });
+        } catch (error) {
+            console.error('Error in playMusic:', error);
+        }
+    }, [post.music, post._id]);
+
+    const pauseMusic = React.useCallback(() => {
+        console.log('pauseMusic called');
+        if (audioRef.current) {
+            audioRef.current.pause();
+            setIsMusicPlaying(false);
+        }
+    }, []);
+
+    const toggleMusic = React.useCallback(() => {
+        if (isMusicPlaying) {
+            pauseMusic();
+        } else {
+            playMusic();
+        }
+    }, [isMusicPlaying, playMusic, pauseMusic]);
+
+    // Auto-play music when post is in view (like Instagram)
+    useEffect(() => {
+        const musicUrl = post.music?.previewUrl || post.music?.preview_url;
+        if (!musicUrl) {
+            console.log('No music URL for post:', post._id);
+            return;
+        }
+
+        console.log('Setting up music auto-play for post:', post._id, 'URL:', musicUrl);
+        const currentPost = postRef.current;
+        
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    console.log('Post visibility changed:', post._id, 'isIntersecting:', entry.isIntersecting);
+                    if (entry.isIntersecting) {
+                        console.log('Post is in view, playing music');
+                        playMusic();
+                    } else {
+                        console.log('Post is out of view, pausing music');
+                        pauseMusic();
+                    }
+                });
+            },
+            { 
+                threshold: 0.5,
+                rootMargin: '0px'
+            }
+        );
+
+        if (currentPost) {
+            observer.observe(currentPost);
+            console.log('Observer attached to post:', post._id);
+        } else {
+            console.log('postRef.current is null for post:', post._id);
+        }
+
+        return () => {
+            if (currentPost) {
+                observer.unobserve(currentPost);
+            }
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = '';
+                audioRef.current = null;
+            }
+        };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [post.music, playMusic, pauseMusic]);
 
     // Fetch likes when modal opens
     const handleOpenLikesModal = async () => {
@@ -332,23 +449,86 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
         return past.toLocaleDateString();
     };
 
-    const handleShare = () => {
+    const handleCopyLink = () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const shareText = `Check out this post by ${post.user.name}:\n\n${post.content}\n\n${postUrl}`;
+        
+        navigator.clipboard.writeText(shareText).then(() => {
+            toast.success('Post link copied to clipboard!', {
+                position: "top-right",
+                autoClose: 2000,
+            });
+        }).catch(err => {
+            toast.error('Failed to copy link', {
+                position: "top-right",
+                autoClose: 2000,
+            });
+        });
+    };
+
+    const handleShareToTwitter = () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const text = encodeURIComponent(`${post.content.substring(0, 200)}${post.content.length > 200 ? '...' : ''}`);
+        const url = encodeURIComponent(postUrl);
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=550,height=420');
+    };
+
+    const handleShareToFacebook = () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const url = encodeURIComponent(postUrl);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
+    };
+
+    const handleShareToLinkedIn = () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const url = encodeURIComponent(postUrl);
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=550,height=420');
+    };
+
+    const handleShareToWhatsApp = () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const text = encodeURIComponent(`Check out this post by ${post.user.name}:\n\n${post.content}\n\n${postUrl}`);
+        window.open(`https://wa.me/?text=${text}`, '_blank');
+    };
+
+    const handleShareToInstagram = async () => {
+        setShowShareMenu(false);
+        const postUrl = `${window.location.origin}/post/${post._id}`;
+        const shareText = `Check out this post by ${post.user.name}:\n\n${post.content}\n\n${postUrl}`;
+        
+        try {
+            await navigator.clipboard.writeText(shareText);
+            toast.success('Content copied! Open Instagram to share.', {
+                position: "top-right",
+                autoClose: 3000,
+            });
+            setTimeout(() => {
+                window.open('https://www.instagram.com/', '_blank');
+            }, 500);
+        } catch (err) {
+            toast.error('Failed to copy content', {
+                position: "top-right",
+                autoClose: 2000,
+            });
+        }
+    };
+
+    const handleNativeShare = () => {
         setShowShareMenu(false);
         if (navigator.share) {
+            const postUrl = `${window.location.origin}/post/${post._id}`;
             navigator.share({
                 title: `${post.user.name}'s post`,
                 text: post.content,
-                url: window.location.href
+                url: postUrl
             }).catch(err => console.log('Error sharing:', err));
         } else {
-            // Fallback - copy to clipboard
-            const shareText = `Check out this post by ${post.user.name}: ${post.content}`;
-            navigator.clipboard.writeText(shareText).then(() => {
-                toast.success('Post link copied to clipboard!', {
-                    position: "top-right",
-                    autoClose: 2000,
-                });
-            });
+            handleCopyLink();
         }
     };
 
@@ -491,7 +671,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
     };
 
     return (
-        <div className="post-card">
+        <div className="post-card" ref={postRef}>
             <div className="post-header">
                 <div className="post-user-info">
                     <div className="post-avatar" onClick={() => history.push(`/profile/${post.user._id}`)}>
@@ -581,6 +761,36 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                     ></iframe>
+                </div>
+            )}
+
+            {/* Music Display */}
+            {post.music && (
+                <div className="post-music">
+                    <div className="music-player">
+                        <span className={`music-icon-pulse ${isMusicPlaying ? 'playing' : ''}`}>🎵</span>
+                        <div className="music-info-display">
+                            <div className="music-title-display">{post.music.trackName || post.music.title || 'Unknown Track'}</div>
+                            <div className="music-artist-display">{post.music.artistName || post.music.artist || 'Unknown Artist'}</div>
+                        </div>
+                        {post.music.previewUrl || post.music.preview_url ? (
+                            <button 
+                                className="music-play-btn"
+                                onClick={toggleMusic}
+                                title={isMusicPlaying ? "Pause music" : "Play music"}
+                            >
+                                {isMusicPlaying ? '⏸' : '▶️'}
+                            </button>
+                        ) : (
+                            <button 
+                                className="music-play-btn"
+                                onClick={() => window.open(`https://open.spotify.com/search/${encodeURIComponent(`${post.music.trackName || post.music.title} ${post.music.artistName || post.music.artist}`)}`, '_blank')}
+                                title="Open in Spotify"
+                            >
+                                🎧
+                            </button>
+                        )}
+                    </div>
                 </div>
             )}
 
@@ -716,12 +926,46 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     </button>
                     {showShareMenu && (
                         <div className="share-menu">
-                            <button onClick={handleShare}>
-                                <span>📋</span> Copy Link
-                            </button>
-                            <button onClick={handleShareToStory}>
-                                <span>📸</span> Share to Story
-                            </button>
+                            <div className="share-menu-section">
+                                <div className="share-menu-title">Share to</div>
+                                <button onClick={handleShareToTwitter} className="share-menu-item">
+                                    <span className="share-icon twitter">𝕏</span>
+                                    <span>Twitter</span>
+                                </button>
+                                <button onClick={handleShareToFacebook} className="share-menu-item">
+                                    <span className="share-icon facebook">f</span>
+                                    <span>Facebook</span>
+                                </button>
+                                <button onClick={handleShareToLinkedIn} className="share-menu-item">
+                                    <span className="share-icon linkedin">in</span>
+                                    <span>LinkedIn</span>
+                                </button>
+                                <button onClick={handleShareToWhatsApp} className="share-menu-item">
+                                    <span className="share-icon whatsapp">📱</span>
+                                    <span>WhatsApp</span>
+                                </button>
+                                <button onClick={handleShareToInstagram} className="share-menu-item">
+                                    <span className="share-icon instagram">📷</span>
+                                    <span>Instagram</span>
+                                </button>
+                            </div>
+                            <div className="share-menu-divider"></div>
+                            <div className="share-menu-section">
+                                <button onClick={handleCopyLink} className="share-menu-item">
+                                    <span className="share-icon">📋</span>
+                                    <span>Copy Link</span>
+                                </button>
+                                <button onClick={handleShareToStory} className="share-menu-item">
+                                    <span className="share-icon">📸</span>
+                                    <span>Share to Story</span>
+                                </button>
+                                {navigator.share && (
+                                    <button onClick={handleNativeShare} className="share-menu-item">
+                                        <span className="share-icon">↗️</span>
+                                        <span>More Options</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

@@ -3,6 +3,8 @@ import { Link, useLocation, useHistory } from 'react-router-dom';
 import io from 'socket.io-client';
 import './Sidebar.css';
 import ManageAccount from './ManageAccount';
+import QRCodeModal from './QRCodeModal';
+import QRScanner from './QRScanner';
 
 const SOCKET_URL = 'http://localhost:5000';
 
@@ -13,7 +15,10 @@ const Sidebar = () => {
     const [friendRequests, setFriendRequests] = useState(0);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showManageAccount, setShowManageAccount] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [showQRScanner, setShowQRScanner] = useState(false);
     const [user, setUser] = useState(null);
+    const [theme, setTheme] = useState('light');
     const socketRef = useRef(null);
     const currentUserRef = useRef(null);
     const userMenuRef = useRef(null);
@@ -22,6 +27,11 @@ const Sidebar = () => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
         currentUserRef.current = userData;
         setUser(userData);
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+        document.documentElement.setAttribute('data-theme', savedTheme);
 
         // Initialize Socket.io connection
         socketRef.current = io(SOCKET_URL);
@@ -236,6 +246,37 @@ const Sidebar = () => {
                                     <span className="menu-icon">⚙️</span>
                                     <span>Manage account</span>
                                 </button>
+                                <button className="menu-action-item" onClick={() => {
+                                    setShowUserMenu(false);
+                                    setShowQRModal(true);
+                                }}>
+                                    <span className="menu-icon">📱</span>
+                                    <span>My QR Code</span>
+                                </button>
+                                <button className="menu-action-item" onClick={() => {
+                                    setShowUserMenu(false);
+                                    setShowQRScanner(true);
+                                }}>
+                                    <span className="menu-icon">📷</span>
+                                    <span>Scan QR Code</span>
+                                </button>
+                                <div className="menu-action-item theme-toggle-menu">
+                                    <span className="menu-icon">🌙</span>
+                                    <span>Dark Mode</span>
+                                    <label className="toggle-switch">
+                                        <input 
+                                            type="checkbox" 
+                                            checked={theme === 'dark'}
+                                            onChange={() => {
+                                                const newTheme = theme === 'light' ? 'dark' : 'light';
+                                                setTheme(newTheme);
+                                                localStorage.setItem('theme', newTheme);
+                                                document.documentElement.setAttribute('data-theme', newTheme);
+                                            }}
+                                        />
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
                                 <button className="menu-action-item" onClick={handleSignOut}>
                                     <span className="menu-icon">🚪</span>
                                     <span>Sign out</span>
@@ -266,6 +307,17 @@ const Sidebar = () => {
             <ManageAccount 
                 isOpen={showManageAccount} 
                 onClose={() => setShowManageAccount(false)} 
+            />
+
+            <QRCodeModal 
+                isOpen={showQRModal}
+                onClose={() => setShowQRModal(false)}
+                user={user}
+            />
+
+            <QRScanner 
+                isOpen={showQRScanner}
+                onClose={() => setShowQRScanner(false)}
             />
         </div>
     );

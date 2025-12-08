@@ -4,8 +4,31 @@ import User from '../models/User.js';
 // Create a new story
 export const createStory = async (req, res) => {
   try {
-    const { type, text, backgroundColor, music, question, poll, mentions, isCloseFriendsOnly } = req.body;
+    let { type, text, backgroundColor, music, question, poll, mentions, isCloseFriendsOnly } = req.body;
     const userId = req.user?.id || req.user?._id || req.user;
+
+    // Parse JSON fields if they come as strings (from FormData)
+    if (typeof music === 'string') {
+      try {
+        music = JSON.parse(music);
+      } catch (e) {
+        console.error('Failed to parse music JSON:', e);
+      }
+    }
+    if (typeof question === 'string') {
+      try {
+        question = JSON.parse(question);
+      } catch (e) {
+        console.error('Failed to parse question JSON:', e);
+      }
+    }
+    if (typeof poll === 'string') {
+      try {
+        poll = JSON.parse(poll);
+      } catch (e) {
+        console.error('Failed to parse poll JSON:', e);
+      }
+    }
 
     // Get uploaded file path if exists
     const mediaUrl = req.file ? `/uploads/stories/${req.file.filename}` : null;
@@ -18,7 +41,7 @@ export const createStory = async (req, res) => {
     // Build content object
     const content = {};
     if (type === 'text') {
-      if (!text) {
+      if (!text || !text.trim()) {
         return res.status(400).json({ message: 'Text is required for text stories' });
       }
       content.text = text;
@@ -119,7 +142,13 @@ export const createStory = async (req, res) => {
     res.status(201).json(story);
   } catch (error) {
     console.error('Error creating story:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error details:', error.message);
+    console.error('Request body:', req.body);
+    res.status(500).json({ 
+      message: 'Server error', 
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { createStory } from '../api';
+import MusicPicker from '../components/MusicPicker';
 import './CreateStory.css';
 
 const CreateStory = () => {
@@ -11,6 +12,10 @@ const CreateStory = () => {
     const [mediaPreview, setMediaPreview] = useState(null);
     const [mediaFile, setMediaFile] = useState(null);
     const fileInputRef = useRef(null);
+    
+    // Music
+    const [showMusicPicker, setShowMusicPicker] = useState(false);
+    const [selectedMusic, setSelectedMusic] = useState(null);
     
     // Q&A Question
     const [questionText, setQuestionText] = useState('');
@@ -40,6 +45,31 @@ const CreateStory = () => {
         }
     };
 
+    const handleMusicSelect = (music) => {
+        setSelectedMusic(music);
+        setShowMusicPicker(false);
+    };
+
+    const handleRemoveMusic = () => {
+        setSelectedMusic(null);
+    };
+
+    // Helper function to convert duration from MM:SS to seconds
+    const parseDuration = (duration) => {
+        if (typeof duration === 'number') return duration;
+        if (!duration) return 0;
+        
+        // If it's in MM:SS format
+        if (typeof duration === 'string' && duration.includes(':')) {
+            const parts = duration.split(':');
+            const minutes = parseInt(parts[0]) || 0;
+            const seconds = parseInt(parts[1]) || 0;
+            return minutes * 60 + seconds;
+        }
+        
+        return parseInt(duration) || 0;
+    };
+
     const handleSubmit = async () => {
         try {
             // Validate content based on type
@@ -56,34 +86,65 @@ const CreateStory = () => {
                 return;
             }
             if (storyType === 'poll' && (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2)) {
-                alert('Please enter a poll question and at least 2 options');
+                alert('Please enter a question and at least 2 options');
                 return;
             }
 
-            // Prepare story data
-            const storyData = {
-                type: storyType === 'media' ? 'image' : storyType
-            };
-
-            if (storyType === 'text') {
-                storyData.text = textContent;
-                storyData.backgroundColor = backgroundColor;
-            } else if (storyType === 'media') {
-                storyData.content = { mediaUrl: mediaPreview };
-            } else if (storyType === 'question') {
-                storyData.question = { text: questionText };
-                storyData.backgroundColor = backgroundColor;
-            } else if (storyType === 'poll') {
-                const filteredOptions = pollOptions.filter(o => o.trim());
-                storyData.poll = {
-                    question: pollQuestion,
-                    options: filteredOptions
+            // Prepare story data based on type
+            let requestData;
+            console.log('Creating story with music:', selectedMusic);
+            
+            if (storyType === 'media' && mediaFile) {
+                // Use FormData for media upload
+                requestData = new FormData();
+                requestData.append('type', 'image');
+                requestData.append('media', mediaFile);
+                
+                // Add music if selected
+                if (selectedMusic) {
+                    requestData.append('music', JSON.stringify({
+                        trackName: selectedMusic.title || selectedMusic.trackName,
+                        artistName: selectedMusic.artist || selectedMusic.artistName,
+                        previewUrl: selectedMusic.previewUrl,
+                        albumArt: selectedMusic.cover || selectedMusic.albumArt,
+                        duration: parseDuration(selectedMusic.duration)
+                    }));
+                }
+            } else {
+                // Use JSON for text, question, and poll stories
+                requestData = {
+                    type: storyType
                 };
-                storyData.backgroundColor = '#000000';
+
+                // Add music if selected
+                if (selectedMusic && selectedMusic.title && selectedMusic.artist) {
+                    requestData.music = {
+                        trackName: selectedMusic.title || selectedMusic.trackName || '',
+                        artistName: selectedMusic.artist || selectedMusic.artistName || '',
+                        previewUrl: selectedMusic.previewUrl || '',
+                        albumArt: selectedMusic.cover || selectedMusic.albumArt || '',
+                        duration: parseDuration(selectedMusic.duration)
+                    };
+                }
+
+                if (storyType === 'text') {
+                    requestData.text = textContent;
+                    requestData.backgroundColor = backgroundColor;
+                } else if (storyType === 'question') {
+                    requestData.question = { text: questionText };
+                    requestData.backgroundColor = backgroundColor;
+                } else if (storyType === 'poll') {
+                    const filteredOptions = pollOptions.filter(o => o.trim());
+                    requestData.poll = {
+                        question: pollQuestion,
+                        options: filteredOptions
+                    };
+                    requestData.backgroundColor = '#000000';
+                }
             }
 
             // Send to backend
-            await createStory(storyData);
+            await createStory(requestData);
 
             // Store success notification flag
             sessionStorage.setItem('storyCreated', 'true');
@@ -92,7 +153,10 @@ const CreateStory = () => {
             history.push('/dashboard');
         } catch (error) {
             console.error('Error creating story:', error);
-            alert(error.response?.data?.message || 'Failed to create story');
+            const errorMessage = error.response?.data?.message 
+                || error.message 
+                || 'Failed to create story. Please try again.';
+            alert(errorMessage);
         }
     };
 
@@ -118,6 +182,7 @@ const CreateStory = () => {
             </div>
 
             <div className="create-story-content">
+                {/* Story Preview */}
                 {storyType === 'text' && (
                     <div 
                         className="story-canvas" 
@@ -130,13 +195,47 @@ const CreateStory = () => {
                             onChange={(e) => setTextContent(e.target.value)}
                             maxLength={200}
                         />
+                        {selectedMusic && (
+                            <div className="story-music-badge instagram-style">
+                                <div className="music-album-art">
+                                    {selectedMusic.cover ? (
+                                        <img src={selectedMusic.cover} alt="Album" />
+                                    ) : (
+                                        <div className="music-icon-placeholder">🎵</div>
+                                    )}
+                                </div>
+                                <div className="music-details">
+                                    <div className="music-track">{selectedMusic.title || selectedMusic.trackName || 'Unknown'}</div>
+                                    <div className="music-artist">{selectedMusic.artist || selectedMusic.artistName || 'Unknown Artist'}</div>
+                                </div>
+                                <button className="remove-music" onClick={handleRemoveMusic}>✕</button>
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {storyType === 'media' && (
                     <div className="story-canvas media-canvas">
                         {mediaPreview ? (
-                            <img src={mediaPreview} alt="Story preview" className="story-media-preview" />
+                            <>
+                                <img src={mediaPreview} alt="Story preview" className="story-media-preview" />
+                                {selectedMusic && (
+                                    <div className="story-music-badge instagram-style">
+                                        <div className="music-album-art">
+                                            {selectedMusic.cover ? (
+                                                <img src={selectedMusic.cover} alt="Album" />
+                                            ) : (
+                                                <div className="music-icon-placeholder">🎵</div>
+                                            )}
+                                        </div>
+                                        <div className="music-details">
+                                            <div className="music-track">{selectedMusic.title || selectedMusic.trackName || 'Unknown'}</div>
+                                            <div className="music-artist">{selectedMusic.artist || selectedMusic.artistName || 'Unknown Artist'}</div>
+                                        </div>
+                                        <button className="remove-music" onClick={handleRemoveMusic}>✕</button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <div className="media-placeholder" onClick={() => fileInputRef.current?.click()}>
                                 <span className="media-icon">📷</span>
@@ -187,6 +286,21 @@ const CreateStory = () => {
                     </div>
                 )}
 
+                {/* Color Picker for Text and Question */}
+                {(storyType === 'text' || storyType === 'question') && (
+                    <div className="color-picker">
+                        {backgroundColors.map((color) => (
+                            <button
+                                key={color}
+                                className={`color-btn ${backgroundColor === color ? 'active' : ''}`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => setBackgroundColor(color)}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {/* Poll Edit Section */}
                 {storyType === 'poll' && (
                     <div className="poll-edit-section">
                         <input
@@ -218,19 +332,18 @@ const CreateStory = () => {
                     </div>
                 )}
 
-                {(storyType === 'text' || storyType === 'question') && (
-                    <div className="color-picker">
-                        {backgroundColors.map((color) => (
-                            <button
-                                key={color}
-                                className={`color-btn ${backgroundColor === color ? 'active' : ''}`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => setBackgroundColor(color)}
-                            />
-                        ))}
-                    </div>
-                )}
+                {/* Music Tools */}
+                <div className="story-tools">
+                    <button 
+                        className="story-tool-btn"
+                        onClick={() => setShowMusicPicker(true)}
+                        title="Add music"
+                    >
+                        🎵 Music
+                    </button>
+                </div>
 
+                {/* Story Type Selector */}
                 <div className="story-type-selector">
                     <button 
                         className={`type-btn ${storyType === 'text' ? 'active' : ''}`}
@@ -270,6 +383,7 @@ const CreateStory = () => {
                     />
                 </div>
 
+                {/* Create Button */}
                 <button 
                     className="create-story-btn"
                     onClick={handleSubmit}
@@ -283,6 +397,14 @@ const CreateStory = () => {
                     ✨ Create Story
                 </button>
             </div>
+
+            {/* Music Picker Modal */}
+            {showMusicPicker && (
+                <MusicPicker 
+                    onSelect={handleMusicSelect}
+                    onClose={() => setShowMusicPicker(false)}
+                />
+            )}
         </div>
     );
 };

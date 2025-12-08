@@ -1,15 +1,15 @@
 .messages-page {
   display: flex;
   height: 100vh;
-  background: #fafbfc;
+  background: var(--bg-primary);
   overflow: hidden;
   margin-left: 270px;
 }
 
 .messages-sidebar {
   width: 380px;
-  background: white;
-  border-right: 1px solid #e8e8ed;
+  background: var(--card-bg);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   padding: 0;
@@ -21,13 +21,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 24px 20px;
-  border-bottom: 1px solid #e8e8ed;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .messages-header h2 {
   font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-primary);
 }
 
 .header-actions {
@@ -80,10 +80,10 @@
 .tab-btn {
   flex: 1;
   padding: 10px 16px;
-  background: #f5f5f7;
+  background: var(--hover-bg);
   border: none;
   border-radius: 20px;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -91,8 +91,8 @@
 }
 
 .tab-btn:hover {
-  color: #1a1a1a;
-  background: #ebebed;
+  color: var(--text-primary);
+  background: var(--hover-bg);
 }
 
 .tab-btn.active {
@@ -102,19 +102,20 @@
 
 .search-messages {
   padding: 16px 20px;
-  background: white;
+  background: var(--card-bg);
   margin: 0;
-  border-bottom: 1px solid #e8e8ed;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .search-messages input {
   width: 100%;
   padding: 12px 16px;
-  background: #f5f5f7;
+  background: var(--search-bg);
   border: none;
   border-radius: 20px;
   font-size: 14px;
   outline: none;
+  color: var(--text-primary);
 }
 
 .conversations-list {
