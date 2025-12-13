@@ -253,6 +253,12 @@
   font-weight: 600;
 }
 
+/* Voice message preview in sidebar - simple text display */
+.last-message.voice-message {
+  color: #10b981;
+  font-weight: 500;
+}
+
 .unread-badge {
   background: #10b981;
   color: white;
@@ -869,22 +875,34 @@ button.send-btn:disabled {
 }
 
 .emoji-picker-container-msg {
-  position: static;
+  position: relative;
 }
 
 .emoji-picker-msg {
-  position: fixed;
-  bottom: 80px;
-  left: auto;
-  right: 24px;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
   width: 320px;
   background: #1f1f1f;
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   padding: 0;
   z-index: 10000;
   animation: slideUp 0.2s ease;
   overflow: hidden;
+}
+
+/* Arrow pointing to emoji button */
+.emoji-picker-msg::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 16px;
+  width: 16px;
+  height: 16px;
+  background: #1f1f1f;
+  transform: rotate(45deg);
+  border-radius: 2px;
 }
 
 @keyframes slideUp {

@@ -106,11 +106,50 @@ export const documentUpload = multer({
   fileFilter: documentFilter
 });
 
+// Audio storage configuration
+const audioStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(uploadsDir, 'messages'));
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'audio-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+// Audio file filter
+const audioFilter = (req, file, cb) => {
+  const allowedAudioMimes = [
+    'audio/webm',
+    'audio/wav',
+    'audio/mpeg',
+    'audio/ogg',
+    'audio/mp4',
+    'audio/aac'
+  ];
+  const mimetype = allowedAudioMimes.includes(file.mimetype);
+
+  if (mimetype) {
+    return cb(null, true);
+  } else {
+    cb(new Error('Only audio files are allowed!'));
+  }
+};
+
+// Audio upload middleware
+export const audioUpload = multer({
+  storage: audioStorage,
+  limits: {
+    fileSize: 25 * 1024 * 1024, // 25MB limit for audio
+  },
+  fileFilter: audioFilter
+});
+
 // Middleware to handle multer errors
 export const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ message: 'File size too large. Maximum size is 5MB.' });
+      return res.status(400).json({ message: 'File size too large. Maximum size is 25MB.' });
     }
     return res.status(400).json({ message: err.message });
   } else if (err) {

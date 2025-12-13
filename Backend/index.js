@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -42,6 +44,76 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Audio streaming middleware - must come before static file serve
+app.get('/uploads/messages/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(process.cwd(), 'uploads', 'messages', filename);
+  
+  // Security: prevent directory traversal
+  if (!filePath.startsWith(path.join(process.cwd(), 'uploads'))) {
+    return res.status(403).send('Forbidden');
+  }
+  
+  // Check if file exists
+  fs.stat(filePath, (err, stat) => {
+    if (err || !stat.isFile()) {
+      console.log(`❌ Audio file not found: ${filePath}`);
+      return res.status(404).send('File not found');
+    }
+
+    const isAudio = /\.(webm|wav|ogg|mp3|m4a|aac)$/i.test(filename);
+    
+    if (isAudio) {
+      const ext = path.extname(filename).toLowerCase();
+      const mimeTypes = {
+        '.webm': 'audio/webm',
+        '.wav': 'audio/wav',
+        '.ogg': 'audio/ogg',
+        '.mp3': 'audio/mpeg',
+        '.m4a': 'audio/mp4',
+        '.aac': 'audio/aac'
+      };
+      
+      const mimeType = mimeTypes[ext] || 'audio/webm';
+      const fileSize = stat.size;
+      
+      res.setHeader('Content-Type', mimeType);
+      res.setHeader('Content-Length', fileSize);
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      res.setHeader('Content-Disposition', 'inline');
+      
+      // Log audio streaming only if in development
+      if (process.env.NODE_ENV !== 'production') {
+        // Uncomment for debugging: console.log(`✅ Streaming audio: ${filename} (${(fileSize/1024).toFixed(2)} KB)`);
+      }
+      
+      // Support range requests for streaming
+      const range = req.headers.range;
+      if (range) {
+        const parts = range.replace(/bytes=/, '').split('-');
+        const start = parseInt(parts[0], 10);
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+        
+        if (start >= fileSize) {
+          res.status(416).send('Requested Range Not Satisfiable');
+          return;
+        }
+        
+        res.status(206);
+        res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+        res.setHeader('Content-Length', (end - start + 1));
+        fs.createReadStream(filePath, { start, end }).pipe(res);
+      } else {
+        fs.createReadStream(filePath).pipe(res);
+      }
+    } else {
+      // For non-audio files, use express static
+      express.static('uploads')(req, res);
+    }
+  });
+});
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'));
@@ -300,6 +372,14 @@ io.on('connection', (socket) => {
 
 // Initialize socket instances in friendController
 setSocketInstances(io, userSocketMap);
+
+// Make io and userSocketMap accessible via req.app.get()
+app.set('io', io);
+app.set('onlineUsers', userSocketMap);
+
+// Make io globally accessible to controllers
+global.io = io;
+global.userSocketMap = userSocketMap;
 
 const PORT = process.env.PORT || 5000;
 

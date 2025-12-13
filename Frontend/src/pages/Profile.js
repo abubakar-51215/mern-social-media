@@ -4,7 +4,6 @@ import { getUserProfile, getUserPosts, getLikedPosts, sendFriendRequest, removeF
 import { getUser } from '../utils/auth';
 import PostCard from '../components/PostCard';
 import Sidebar from '../components/Sidebar';
-import QRCodeModal from '../components/QRCodeModal';
 import './Profile.css';
 
 const Profile = () => {
@@ -29,7 +28,6 @@ const Profile = () => {
   const [showFollowingModal, setShowFollowingModal] = useState(false);
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
-  const [showQRModal, setShowQRModal] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -357,13 +355,6 @@ const Profile = () => {
                   onClick={() => history.push('/edit-profile')}
                 >
                   Edit Profile
-                </button>
-                <button 
-                  className="btn-qr-code"
-                  onClick={() => setShowQRModal(true)}
-                  title="Show QR Code"
-                >
-                  📱
                 </button>
               </>
             ) : (
@@ -732,12 +723,6 @@ const Profile = () => {
           </div>
         </div>
       )}
-
-      <QRCodeModal 
-        isOpen={showQRModal}
-        onClose={() => setShowQRModal(false)}
-        user={profile || currentUser}
-      />
     </div>
   );
 };

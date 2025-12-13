@@ -21,7 +21,7 @@ const ConversationSchema = new mongoose.Schema({
 // Ensure there are exactly 2 participants
 ConversationSchema.pre('save', function(next) {
   if (this.participants.length !== 2) {
-    next(new Error('A conversation must have exactly 2 participants'));
+    return next(new Error('A conversation must have exactly 2 participants'));
   }
   next();
 });

@@ -300,13 +300,16 @@ router.put("/:postId/like", protect, async (req, res) => {
         });
         
         // Send real-time notification via Socket.io
-        const { io, userSocketMap } = await import('../index.js');
-        const recipientSocketId = userSocketMap.get(post.user._id.toString());
-        if (recipientSocketId) {
-          io.to(recipientSocketId).emit('newNotification', {
-            type: 'like',
-            message: `${liker.name} liked your post`
-          });
+        const io = global.io;
+        const userSocketMap = global.userSocketMap;
+        if (io && userSocketMap) {
+          const recipientSocketId = userSocketMap.get(post.user._id.toString());
+          if (recipientSocketId) {
+            io.to(recipientSocketId).emit('newNotification', {
+              type: 'like',
+              message: `${liker.name} liked your post`
+            });
+          }
         }
       }
     }
@@ -317,22 +320,25 @@ router.put("/:postId/like", protect, async (req, res) => {
       .populate('likes', 'name username profilePicture');
     
     // Emit real-time post update
-    const { io, userSocketMap } = await import('../index.js');
-    const User = (await import('../models/User.js')).default;
-    const postOwner = await User.findById(post.user._id).populate('friends', '_id');
-    
-    // Broadcast to post owner and their friends
-    const broadcastTo = [post.user._id.toString(), ...postOwner.friends.map(f => f._id.toString())];
-    broadcastTo.forEach(userId => {
-      const socketId = userSocketMap.get(userId);
-      if (socketId) {
-        io.to(socketId).emit('postLiked', {
-          postId: post._id,
-          likes: updatedPost.likes,
-          likesCount: updatedPost.likes.length
-        });
-      }
-    });
+    const io = global.io;
+    const userSocketMap = global.userSocketMap;
+    if (io && userSocketMap) {
+      const User = (await import('../models/User.js')).default;
+      const postOwner = await User.findById(post.user._id).populate('friends', '_id');
+      
+      // Broadcast to post owner and their friends
+      const broadcastTo = [post.user._id.toString(), ...postOwner.friends.map(f => f._id.toString())];
+      broadcastTo.forEach(userId => {
+        const socketId = userSocketMap.get(userId);
+        if (socketId) {
+          io.to(socketId).emit('postLiked', {
+            postId: post._id,
+            likes: updatedPost.likes,
+            likesCount: updatedPost.likes.length
+          });
+        }
+      });
+    }
     
     res.json(updatedPost);
   } catch (err) {
@@ -457,13 +463,16 @@ router.post("/:postId/comment", protect, async (req, res) => {
       });
       
       // Send real-time notification via Socket.io
-      const { io, userSocketMap } = await import('../index.js');
-      const recipientSocketId = userSocketMap.get(post.user._id.toString());
-      if (recipientSocketId) {
-        io.to(recipientSocketId).emit('newNotification', {
-          type: 'comment',
-          message: `${commenter.name} commented on your post`
-        });
+      const io = global.io;
+      const userSocketMap = global.userSocketMap;
+      if (io && userSocketMap) {
+        const recipientSocketId = userSocketMap.get(post.user._id.toString());
+        if (recipientSocketId) {
+          io.to(recipientSocketId).emit('newNotification', {
+            type: 'comment',
+            message: `${commenter.name} commented on your post`
+          });
+        }
       }
     }
     
@@ -473,22 +482,25 @@ router.post("/:postId/comment", protect, async (req, res) => {
       .populate('likes', 'name username profilePicture');
     
     // Emit real-time post update for comments
-    const { io, userSocketMap } = await import('../index.js');
-    const User = (await import('../models/User.js')).default;
-    const postOwner = await User.findById(post.user._id).populate('friends', '_id');
-    
-    // Broadcast to post owner and their friends
-    const broadcastTo = [post.user._id.toString(), ...postOwner.friends.map(f => f._id.toString())];
-    broadcastTo.forEach(userId => {
-      const socketId = userSocketMap.get(userId);
-      if (socketId) {
-        io.to(socketId).emit('postCommented', {
-          postId: post._id,
-          comments: populatedPost.comments,
-          commentsCount: populatedPost.comments.length
-        });
-      }
-    });
+    const io = global.io;
+    const userSocketMap = global.userSocketMap;
+    if (io && userSocketMap) {
+      const User = (await import('../models/User.js')).default;
+      const postOwner = await User.findById(post.user._id).populate('friends', '_id');
+      
+      // Broadcast to post owner and their friends
+      const broadcastTo = [post.user._id.toString(), ...postOwner.friends.map(f => f._id.toString())];
+      broadcastTo.forEach(userId => {
+        const socketId = userSocketMap.get(userId);
+        if (socketId) {
+          io.to(socketId).emit('postCommented', {
+            postId: post._id,
+            comments: populatedPost.comments,
+            commentsCount: populatedPost.comments.length
+          });
+        }
+      });
+    }
     
     res.json(populatedPost);
   } catch (err) {

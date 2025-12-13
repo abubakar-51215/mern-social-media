@@ -8,6 +8,7 @@ import ForwardModal from '../components/ForwardModal';
 import CreateGroupModal from '../components/CreateGroupModal';
 import GroupInfoModal from '../components/GroupInfoModal';
 import UserProfileModal from '../components/UserProfileModal';
+import { toast } from '../components/Toast';
 import { getConversations, getConversationMessages, sendMessage, getOrCreateConversation, sendVoiceMessage, sendVideoMessage, sendDocument, forwardMessage, getGroups, getGroupMessages, sendGroupMessage, getFriends } from '../api';
 import './Messages.css';
 
@@ -41,40 +42,503 @@ const Messages = () => {
   const documentInputRef = useRef(null);
   const socketRef = useRef(null);
   const typingTimeoutRef = useRef(null);
+  const selectedChatRef = useRef(null); // Ref to track selectedChat for socket handlers
   const history = useHistory();
   const location = useLocation();
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
 
-  const emojiCategories = {
-    'Smileys & people': ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄', '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷', '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '😵', '🤯', '🤠', '🥳', '😎', '🤓', '🧐'],
-    'Animals & nature': ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🌸', '🌺', '🌻', '🌷', '🌹', '🥀', '🌼', '🌵', '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀'],
-    'Food & drink': ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🧆'],
-    'Activity': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🏽', '🛹', '🛷', '⛸️', '🥌', '🎿', '⛷️', '🏂', '🪂', '🏋️', '🤼', '🤸', '🤺', '⛹️', '🤾', '🏌️', '🏇', '🧘', '🏊', '🤽', '🚣', '🧗', '🚴', '🚵', '🎪'],
-    'Travel & places': ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🦯', '🦽', '🦼', '🛴', '🚲', '🛵', '🏍️', '🛺', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚞', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩️', '💺', '🛰️', '🚀', '🛸', '🚁'],
-    'Objects': ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡', '🔋', '🔌', '💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '💸', '💵', '💴', '💶'],
-    'Symbols': ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳'],
-    'Flags': ['🏁', '🚩', '🎌', '🏴', '🏳️', '🏳️‍🌈', '🏴‍☠️', '🇦🇫', '🇦🇽', '🇦🇱', '🇩🇿', '🇦🇸', '🇦🇩', '🇦🇴', '🇦🇮', '🇦🇶', '🇦🇬', '🇦🇷', '🇦🇲', '🇦🇼', '🇦🇺', '🇦🇹', '🇦🇿', '🇧🇸', '🇧🇭', '🇧🇩', '🇧🇧', '🇧🇾', '🇧🇪', '🇧🇿', '🇧🇯', '🇧🇲', '🇧🇹', '🇧🇴', '🇧🇦', '🇧🇼', '🇧🇷', '🇮🇴', '🇻🇬', '🇧🇳', '🇧🇬', '🇧🇫', '🇧🇮', '🇰🇭', '🇨🇲', '🇨🇦', '🇮🇨', '🇨🇻', '🇧🇶']
+  // Emoji data with searchable names
+  const emojiData = {
+    'Smileys & people': [
+      { emoji: '😀', names: ['grinning', 'smile', 'happy'] },
+      { emoji: '😃', names: ['smiley', 'happy', 'joy'] },
+      { emoji: '😄', names: ['smile', 'happy', 'joy'] },
+      { emoji: '😁', names: ['grin', 'happy', 'teeth'] },
+      { emoji: '😆', names: ['laughing', 'satisfied', 'happy'] },
+      { emoji: '😅', names: ['sweat', 'smile', 'nervous'] },
+      { emoji: '🤣', names: ['rofl', 'laughing', 'floor'] },
+      { emoji: '😂', names: ['joy', 'tears', 'laughing', 'lol', 'funny'] },
+      { emoji: '🙂', names: ['smile', 'slightly'] },
+      { emoji: '🙃', names: ['upside', 'down', 'silly'] },
+      { emoji: '😉', names: ['wink', 'flirt'] },
+      { emoji: '😊', names: ['blush', 'smile', 'happy'] },
+      { emoji: '😇', names: ['angel', 'innocent', 'halo'] },
+      { emoji: '🥰', names: ['love', 'hearts', 'adore'] },
+      { emoji: '😍', names: ['heart', 'eyes', 'love', 'crush'] },
+      { emoji: '🤩', names: ['star', 'struck', 'excited', 'wow'] },
+      { emoji: '😘', names: ['kiss', 'love', 'heart'] },
+      { emoji: '😗', names: ['kiss', 'whistle'] },
+      { emoji: '😚', names: ['kiss', 'closed', 'eyes'] },
+      { emoji: '😙', names: ['kiss', 'smile'] },
+      { emoji: '😋', names: ['yum', 'delicious', 'tongue'] },
+      { emoji: '😛', names: ['tongue', 'out', 'playful'] },
+      { emoji: '😜', names: ['wink', 'tongue', 'crazy'] },
+      { emoji: '🤪', names: ['crazy', 'zany', 'wild'] },
+      { emoji: '😝', names: ['tongue', 'closed', 'eyes'] },
+      { emoji: '🤑', names: ['money', 'rich', 'dollar'] },
+      { emoji: '🤗', names: ['hug', 'hugging', 'warm'] },
+      { emoji: '🤭', names: ['giggle', 'shy', 'cover'] },
+      { emoji: '🤫', names: ['shush', 'quiet', 'secret'] },
+      { emoji: '🤔', names: ['thinking', 'hmm', 'wonder'] },
+      { emoji: '🤐', names: ['zipper', 'mouth', 'secret'] },
+      { emoji: '🤨', names: ['raised', 'eyebrow', 'skeptical'] },
+      { emoji: '😐', names: ['neutral', 'meh', 'expressionless'] },
+      { emoji: '😑', names: ['expressionless', 'blank'] },
+      { emoji: '😶', names: ['no', 'mouth', 'silent'] },
+      { emoji: '😏', names: ['smirk', 'smug', 'flirt'] },
+      { emoji: '😒', names: ['unamused', 'annoyed', 'bored'] },
+      { emoji: '🙄', names: ['eye', 'roll', 'whatever'] },
+      { emoji: '😬', names: ['grimace', 'awkward', 'nervous'] },
+      { emoji: '🤥', names: ['lying', 'pinocchio', 'liar'] },
+      { emoji: '😌', names: ['relieved', 'peaceful', 'calm'] },
+      { emoji: '😔', names: ['pensive', 'sad', 'thoughtful'] },
+      { emoji: '😪', names: ['sleepy', 'tired', 'zzz'] },
+      { emoji: '🤤', names: ['drool', 'hungry', 'yum'] },
+      { emoji: '😴', names: ['sleeping', 'zzz', 'tired'] },
+      { emoji: '😷', names: ['mask', 'sick', 'covid'] },
+      { emoji: '🤒', names: ['thermometer', 'sick', 'fever'] },
+      { emoji: '🤕', names: ['bandage', 'hurt', 'injured'] },
+      { emoji: '🤢', names: ['nauseous', 'sick', 'green'] },
+      { emoji: '🤮', names: ['vomit', 'sick', 'throw up'] },
+      { emoji: '🤧', names: ['sneeze', 'tissue', 'sick'] },
+      { emoji: '🥵', names: ['hot', 'sweating', 'heat'] },
+      { emoji: '🥶', names: ['cold', 'freezing', 'frozen'] },
+      { emoji: '😵', names: ['dizzy', 'spiral', 'dead'] },
+      { emoji: '🤯', names: ['mind', 'blown', 'exploding', 'shocked'] },
+      { emoji: '🤠', names: ['cowboy', 'hat', 'yeehaw'] },
+      { emoji: '🥳', names: ['party', 'celebrate', 'birthday'] },
+      { emoji: '😎', names: ['cool', 'sunglasses', 'awesome'] },
+      { emoji: '🤓', names: ['nerd', 'glasses', 'geek'] },
+      { emoji: '🧐', names: ['monocle', 'curious', 'inspect'] }
+    ],
+    'Animals & nature': [
+      { emoji: '🐶', names: ['dog', 'puppy', 'pet'] },
+      { emoji: '🐱', names: ['cat', 'kitty', 'pet'] },
+      { emoji: '🐭', names: ['mouse', 'rat'] },
+      { emoji: '🐹', names: ['hamster', 'pet'] },
+      { emoji: '🐰', names: ['rabbit', 'bunny'] },
+      { emoji: '🦊', names: ['fox', 'clever'] },
+      { emoji: '🐻', names: ['bear', 'teddy'] },
+      { emoji: '🐼', names: ['panda', 'bear'] },
+      { emoji: '🐨', names: ['koala', 'australia'] },
+      { emoji: '🐯', names: ['tiger', 'cat'] },
+      { emoji: '🦁', names: ['lion', 'king'] },
+      { emoji: '🐮', names: ['cow', 'moo'] },
+      { emoji: '🐷', names: ['pig', 'oink'] },
+      { emoji: '🐸', names: ['frog', 'toad'] },
+      { emoji: '🐵', names: ['monkey', 'ape'] },
+      { emoji: '🐔', names: ['chicken', 'hen'] },
+      { emoji: '🐧', names: ['penguin', 'bird'] },
+      { emoji: '🐦', names: ['bird', 'tweet'] },
+      { emoji: '🐤', names: ['chick', 'baby', 'bird'] },
+      { emoji: '🦆', names: ['duck', 'quack'] },
+      { emoji: '🦅', names: ['eagle', 'bird'] },
+      { emoji: '🦉', names: ['owl', 'night'] },
+      { emoji: '🦇', names: ['bat', 'vampire'] },
+      { emoji: '🐺', names: ['wolf', 'howl'] },
+      { emoji: '🐗', names: ['boar', 'pig'] },
+      { emoji: '🐴', names: ['horse', 'pony'] },
+      { emoji: '🦄', names: ['unicorn', 'magic', 'horse'] },
+      { emoji: '🐝', names: ['bee', 'honey', 'buzz'] },
+      { emoji: '🐛', names: ['bug', 'caterpillar'] },
+      { emoji: '🦋', names: ['butterfly', 'beautiful'] },
+      { emoji: '🐌', names: ['snail', 'slow'] },
+      { emoji: '🐞', names: ['ladybug', 'beetle'] },
+      { emoji: '🐜', names: ['ant', 'insect'] },
+      { emoji: '🦟', names: ['mosquito', 'bug'] },
+      { emoji: '🦗', names: ['cricket', 'grasshopper'] },
+      { emoji: '🌸', names: ['cherry', 'blossom', 'flower', 'spring'] },
+      { emoji: '🌺', names: ['hibiscus', 'flower', 'tropical'] },
+      { emoji: '🌻', names: ['sunflower', 'sun', 'yellow'] },
+      { emoji: '🌷', names: ['tulip', 'flower', 'spring'] },
+      { emoji: '🌹', names: ['rose', 'flower', 'love', 'red'] },
+      { emoji: '🥀', names: ['wilted', 'flower', 'dead'] },
+      { emoji: '🌼', names: ['blossom', 'flower', 'yellow'] },
+      { emoji: '🌵', names: ['cactus', 'desert'] },
+      { emoji: '🌲', names: ['tree', 'evergreen', 'christmas'] },
+      { emoji: '🌳', names: ['tree', 'deciduous'] },
+      { emoji: '🌴', names: ['palm', 'tree', 'tropical'] },
+      { emoji: '🌱', names: ['seedling', 'plant', 'grow'] },
+      { emoji: '🌿', names: ['herb', 'leaf', 'plant'] },
+      { emoji: '☘️', names: ['shamrock', 'clover', 'irish'] },
+      { emoji: '🍀', names: ['four', 'leaf', 'clover', 'lucky'] }
+    ],
+    'Food & drink': [
+      { emoji: '🍎', names: ['apple', 'red', 'fruit'] },
+      { emoji: '🍊', names: ['orange', 'tangerine', 'fruit'] },
+      { emoji: '🍋', names: ['lemon', 'yellow', 'citrus'] },
+      { emoji: '🍌', names: ['banana', 'fruit', 'yellow'] },
+      { emoji: '🍉', names: ['watermelon', 'summer', 'fruit'] },
+      { emoji: '🍇', names: ['grapes', 'wine', 'fruit'] },
+      { emoji: '🍓', names: ['strawberry', 'berry', 'fruit'] },
+      { emoji: '🍈', names: ['melon', 'fruit'] },
+      { emoji: '🍒', names: ['cherry', 'cherries', 'fruit'] },
+      { emoji: '🍑', names: ['peach', 'fruit'] },
+      { emoji: '🥭', names: ['mango', 'tropical', 'fruit'] },
+      { emoji: '🍍', names: ['pineapple', 'tropical', 'fruit'] },
+      { emoji: '🥥', names: ['coconut', 'tropical'] },
+      { emoji: '🥝', names: ['kiwi', 'fruit', 'green'] },
+      { emoji: '🍅', names: ['tomato', 'vegetable', 'red'] },
+      { emoji: '🍆', names: ['eggplant', 'aubergine', 'vegetable'] },
+      { emoji: '🥑', names: ['avocado', 'guacamole'] },
+      { emoji: '🥦', names: ['broccoli', 'vegetable', 'green'] },
+      { emoji: '🥬', names: ['lettuce', 'leafy', 'vegetable'] },
+      { emoji: '🥒', names: ['cucumber', 'pickle', 'vegetable'] },
+      { emoji: '🌶️', names: ['pepper', 'hot', 'chili', 'spicy'] },
+      { emoji: '🌽', names: ['corn', 'maize', 'vegetable'] },
+      { emoji: '🥕', names: ['carrot', 'vegetable', 'orange'] },
+      { emoji: '🧄', names: ['garlic', 'vampire'] },
+      { emoji: '🧅', names: ['onion', 'cry'] },
+      { emoji: '🥔', names: ['potato', 'vegetable'] },
+      { emoji: '🍠', names: ['sweet', 'potato', 'yam'] },
+      { emoji: '🥐', names: ['croissant', 'french', 'bread'] },
+      { emoji: '🥯', names: ['bagel', 'bread'] },
+      { emoji: '🍞', names: ['bread', 'toast', 'loaf'] },
+      { emoji: '🥖', names: ['baguette', 'french', 'bread'] },
+      { emoji: '🥨', names: ['pretzel', 'snack'] },
+      { emoji: '🧀', names: ['cheese', 'dairy'] },
+      { emoji: '🥚', names: ['egg', 'breakfast'] },
+      { emoji: '🍳', names: ['fried', 'egg', 'cooking', 'breakfast'] },
+      { emoji: '🧈', names: ['butter', 'dairy'] },
+      { emoji: '🥞', names: ['pancakes', 'breakfast'] },
+      { emoji: '🧇', names: ['waffle', 'breakfast'] },
+      { emoji: '🥓', names: ['bacon', 'meat', 'breakfast'] },
+      { emoji: '🥩', names: ['steak', 'meat', 'beef'] },
+      { emoji: '🍗', names: ['chicken', 'drumstick', 'meat'] },
+      { emoji: '🍖', names: ['meat', 'bone', 'rib'] },
+      { emoji: '🦴', names: ['bone', 'dog'] },
+      { emoji: '🌭', names: ['hotdog', 'sausage', 'bbq'] },
+      { emoji: '🍔', names: ['burger', 'hamburger', 'fast food'] },
+      { emoji: '🍟', names: ['fries', 'french', 'fast food'] },
+      { emoji: '🍕', names: ['pizza', 'italian', 'slice'] },
+      { emoji: '🥪', names: ['sandwich', 'lunch'] },
+      { emoji: '🥙', names: ['pita', 'falafel', 'wrap'] },
+      { emoji: '🧆', names: ['falafel', 'middle eastern'] }
+    ],
+    'Activity': [
+      { emoji: '⚽', names: ['soccer', 'football', 'ball', 'sport'] },
+      { emoji: '🏀', names: ['basketball', 'ball', 'sport'] },
+      { emoji: '🏈', names: ['football', 'american', 'nfl', 'sport'] },
+      { emoji: '⚾', names: ['baseball', 'ball', 'sport'] },
+      { emoji: '🥎', names: ['softball', 'ball'] },
+      { emoji: '🎾', names: ['tennis', 'ball', 'sport'] },
+      { emoji: '🏐', names: ['volleyball', 'ball', 'sport'] },
+      { emoji: '🏉', names: ['rugby', 'ball', 'sport'] },
+      { emoji: '🥏', names: ['frisbee', 'disc'] },
+      { emoji: '🎱', names: ['pool', 'billiards', 'eight ball'] },
+      { emoji: '🪀', names: ['yoyo', 'toy'] },
+      { emoji: '🏓', names: ['ping pong', 'table tennis'] },
+      { emoji: '🏸', names: ['badminton', 'shuttlecock'] },
+      { emoji: '🏒', names: ['hockey', 'ice', 'sport'] },
+      { emoji: '🏑', names: ['field hockey', 'sport'] },
+      { emoji: '🥍', names: ['lacrosse', 'sport'] },
+      { emoji: '🏏', names: ['cricket', 'bat'] },
+      { emoji: '🥅', names: ['goal', 'net'] },
+      { emoji: '⛳', names: ['golf', 'hole', 'flag'] },
+      { emoji: '🪁', names: ['kite', 'flying'] },
+      { emoji: '🏹', names: ['archery', 'bow', 'arrow'] },
+      { emoji: '🎣', names: ['fishing', 'rod', 'fish'] },
+      { emoji: '🤿', names: ['diving', 'scuba', 'snorkel'] },
+      { emoji: '🥊', names: ['boxing', 'glove', 'fight'] },
+      { emoji: '🥋', names: ['martial arts', 'karate', 'judo'] },
+      { emoji: '🏽', names: ['skin', 'tone'] },
+      { emoji: '🛹', names: ['skateboard', 'skate'] },
+      { emoji: '🛷', names: ['sled', 'sledge', 'winter'] },
+      { emoji: '⛸️', names: ['ice', 'skating', 'winter'] },
+      { emoji: '🥌', names: ['curling', 'stone', 'winter'] },
+      { emoji: '🎿', names: ['ski', 'skiing', 'winter', 'snow'] },
+      { emoji: '⛷️', names: ['skier', 'skiing', 'winter'] },
+      { emoji: '🏂', names: ['snowboard', 'winter', 'snow'] },
+      { emoji: '🪂', names: ['parachute', 'skydiving'] },
+      { emoji: '🏋️', names: ['weightlifting', 'gym', 'workout'] },
+      { emoji: '🤼', names: ['wrestling', 'fight'] },
+      { emoji: '🤸', names: ['cartwheel', 'gymnastics'] },
+      { emoji: '🤺', names: ['fencing', 'sword'] },
+      { emoji: '⛹️', names: ['basketball', 'bouncing', 'ball'] },
+      { emoji: '🤾', names: ['handball', 'sport'] },
+      { emoji: '🏌️', names: ['golf', 'golfing'] },
+      { emoji: '🏇', names: ['horse', 'racing', 'jockey'] },
+      { emoji: '🧘', names: ['yoga', 'meditation', 'zen'] },
+      { emoji: '🏊', names: ['swimming', 'pool', 'swim'] },
+      { emoji: '🤽', names: ['water polo', 'swim'] },
+      { emoji: '🚣', names: ['rowing', 'boat'] },
+      { emoji: '🧗', names: ['climbing', 'rock'] },
+      { emoji: '🚴', names: ['cycling', 'bike', 'bicycle'] },
+      { emoji: '🚵', names: ['mountain', 'biking'] },
+      { emoji: '🎪', names: ['circus', 'tent'] }
+    ],
+    'Travel & places': [
+      { emoji: '🚗', names: ['car', 'automobile', 'vehicle'] },
+      { emoji: '🚕', names: ['taxi', 'cab', 'car'] },
+      { emoji: '🚙', names: ['suv', 'car', 'vehicle'] },
+      { emoji: '🚌', names: ['bus', 'public transport'] },
+      { emoji: '🚎', names: ['trolleybus', 'bus'] },
+      { emoji: '🏎️', names: ['racing', 'car', 'fast'] },
+      { emoji: '🚓', names: ['police', 'car', 'cop'] },
+      { emoji: '🚑', names: ['ambulance', 'hospital', 'emergency'] },
+      { emoji: '🚒', names: ['fire', 'truck', 'emergency'] },
+      { emoji: '🚐', names: ['minibus', 'van'] },
+      { emoji: '🚚', names: ['truck', 'delivery'] },
+      { emoji: '🚛', names: ['truck', 'semi', 'lorry'] },
+      { emoji: '🚜', names: ['tractor', 'farm'] },
+      { emoji: '🦯', names: ['cane', 'blind'] },
+      { emoji: '🦽', names: ['wheelchair', 'manual'] },
+      { emoji: '🦼', names: ['wheelchair', 'motorized'] },
+      { emoji: '🛴', names: ['scooter', 'kick'] },
+      { emoji: '🚲', names: ['bike', 'bicycle', 'cycling'] },
+      { emoji: '🛵', names: ['scooter', 'moped', 'vespa'] },
+      { emoji: '🏍️', names: ['motorcycle', 'bike'] },
+      { emoji: '🛺', names: ['rickshaw', 'auto'] },
+      { emoji: '🚨', names: ['police', 'siren', 'emergency'] },
+      { emoji: '🚔', names: ['police', 'car'] },
+      { emoji: '🚍', names: ['bus', 'front'] },
+      { emoji: '🚘', names: ['car', 'oncoming'] },
+      { emoji: '🚖', names: ['taxi', 'oncoming'] },
+      { emoji: '🚡', names: ['cable', 'car', 'aerial'] },
+      { emoji: '🚠', names: ['mountain', 'cableway'] },
+      { emoji: '🚟', names: ['suspension', 'railway'] },
+      { emoji: '🚃', names: ['railway', 'car', 'train'] },
+      { emoji: '🚋', names: ['tram', 'car', 'streetcar'] },
+      { emoji: '🚞', names: ['mountain', 'railway'] },
+      { emoji: '🚝', names: ['monorail', 'train'] },
+      { emoji: '🚄', names: ['bullet', 'train', 'fast', 'shinkansen'] },
+      { emoji: '🚅', names: ['train', 'high speed'] },
+      { emoji: '🚈', names: ['light', 'rail', 'train'] },
+      { emoji: '🚂', names: ['locomotive', 'train', 'steam'] },
+      { emoji: '🚆', names: ['train', 'railway'] },
+      { emoji: '🚇', names: ['metro', 'subway', 'underground'] },
+      { emoji: '🚊', names: ['tram', 'streetcar'] },
+      { emoji: '🚉', names: ['station', 'train'] },
+      { emoji: '✈️', names: ['airplane', 'plane', 'flight', 'travel'] },
+      { emoji: '🛫', names: ['takeoff', 'airplane', 'departure'] },
+      { emoji: '🛬', names: ['landing', 'airplane', 'arrival'] },
+      { emoji: '🛩️', names: ['small', 'plane', 'aircraft'] },
+      { emoji: '💺', names: ['seat', 'airplane', 'chair'] },
+      { emoji: '🛰️', names: ['satellite', 'space'] },
+      { emoji: '🚀', names: ['rocket', 'space', 'launch'] },
+      { emoji: '🛸', names: ['ufo', 'alien', 'spaceship'] },
+      { emoji: '🚁', names: ['helicopter', 'chopper'] }
+    ],
+    'Objects': [
+      { emoji: '⌚', names: ['watch', 'time', 'clock'] },
+      { emoji: '📱', names: ['phone', 'mobile', 'iphone', 'smartphone'] },
+      { emoji: '📲', names: ['phone', 'arrow', 'call'] },
+      { emoji: '💻', names: ['laptop', 'computer', 'macbook'] },
+      { emoji: '⌨️', names: ['keyboard', 'type', 'computer'] },
+      { emoji: '🖥️', names: ['desktop', 'computer', 'monitor'] },
+      { emoji: '🖨️', names: ['printer', 'print'] },
+      { emoji: '🖱️', names: ['mouse', 'computer', 'click'] },
+      { emoji: '🖲️', names: ['trackball', 'computer'] },
+      { emoji: '🕹️', names: ['joystick', 'game', 'controller'] },
+      { emoji: '🗜️', names: ['clamp', 'compress'] },
+      { emoji: '💾', names: ['floppy', 'disk', 'save'] },
+      { emoji: '💿', names: ['cd', 'disc', 'dvd'] },
+      { emoji: '📀', names: ['dvd', 'disc', 'movie'] },
+      { emoji: '📼', names: ['vhs', 'tape', 'video'] },
+      { emoji: '📷', names: ['camera', 'photo', 'picture'] },
+      { emoji: '📸', names: ['camera', 'flash', 'photo'] },
+      { emoji: '📹', names: ['video', 'camera', 'record'] },
+      { emoji: '🎥', names: ['movie', 'camera', 'film'] },
+      { emoji: '📽️', names: ['projector', 'film', 'movie'] },
+      { emoji: '🎞️', names: ['film', 'frames', 'movie'] },
+      { emoji: '📞', names: ['telephone', 'phone', 'call'] },
+      { emoji: '☎️', names: ['telephone', 'phone', 'call'] },
+      { emoji: '📟', names: ['pager', 'beeper'] },
+      { emoji: '📠', names: ['fax', 'machine'] },
+      { emoji: '📺', names: ['tv', 'television', 'screen'] },
+      { emoji: '📻', names: ['radio', 'music'] },
+      { emoji: '🎙️', names: ['microphone', 'studio', 'podcast'] },
+      { emoji: '🎚️', names: ['slider', 'level', 'audio'] },
+      { emoji: '🎛️', names: ['knobs', 'control', 'audio'] },
+      { emoji: '🧭', names: ['compass', 'direction', 'navigate'] },
+      { emoji: '⏱️', names: ['stopwatch', 'timer', 'time'] },
+      { emoji: '⏲️', names: ['timer', 'clock', 'time'] },
+      { emoji: '⏰', names: ['alarm', 'clock', 'wake'] },
+      { emoji: '🕰️', names: ['mantelpiece', 'clock', 'time'] },
+      { emoji: '⌛', names: ['hourglass', 'sand', 'time'] },
+      { emoji: '⏳', names: ['hourglass', 'flowing', 'time'] },
+      { emoji: '📡', names: ['satellite', 'antenna', 'signal'] },
+      { emoji: '🔋', names: ['battery', 'power', 'charge'] },
+      { emoji: '🔌', names: ['plug', 'electric', 'power'] },
+      { emoji: '💡', names: ['lightbulb', 'idea', 'bright'] },
+      { emoji: '🔦', names: ['flashlight', 'torch', 'light'] },
+      { emoji: '🕯️', names: ['candle', 'light', 'flame'] },
+      { emoji: '🪔', names: ['lamp', 'diya', 'oil'] },
+      { emoji: '🧯', names: ['fire', 'extinguisher', 'safety'] },
+      { emoji: '🛢️', names: ['oil', 'drum', 'barrel'] },
+      { emoji: '💸', names: ['money', 'wings', 'flying'] },
+      { emoji: '💵', names: ['dollar', 'money', 'cash'] },
+      { emoji: '💴', names: ['yen', 'money', 'japan'] },
+      { emoji: '💶', names: ['euro', 'money', 'europe'] }
+    ],
+    'Symbols': [
+      { emoji: '❤️', names: ['heart', 'love', 'red'] },
+      { emoji: '🧡', names: ['heart', 'orange', 'love'] },
+      { emoji: '💛', names: ['heart', 'yellow', 'love'] },
+      { emoji: '💚', names: ['heart', 'green', 'love'] },
+      { emoji: '💙', names: ['heart', 'blue', 'love'] },
+      { emoji: '💜', names: ['heart', 'purple', 'love'] },
+      { emoji: '🖤', names: ['heart', 'black', 'love'] },
+      { emoji: '🤍', names: ['heart', 'white', 'love'] },
+      { emoji: '🤎', names: ['heart', 'brown', 'love'] },
+      { emoji: '💔', names: ['broken', 'heart', 'sad'] },
+      { emoji: '❣️', names: ['heart', 'exclamation', 'love'] },
+      { emoji: '💕', names: ['hearts', 'two', 'love'] },
+      { emoji: '💞', names: ['hearts', 'revolving', 'love'] },
+      { emoji: '💓', names: ['heartbeat', 'love', 'beating'] },
+      { emoji: '💗', names: ['heart', 'growing', 'love'] },
+      { emoji: '💖', names: ['heart', 'sparkle', 'love'] },
+      { emoji: '💘', names: ['heart', 'arrow', 'cupid'] },
+      { emoji: '💝', names: ['heart', 'ribbon', 'gift'] },
+      { emoji: '💟', names: ['heart', 'decoration', 'love'] },
+      { emoji: '☮️', names: ['peace', 'symbol', 'sign'] },
+      { emoji: '✝️', names: ['cross', 'christian', 'religion'] },
+      { emoji: '☪️', names: ['islam', 'muslim', 'religion'] },
+      { emoji: '🕉️', names: ['om', 'hindu', 'religion'] },
+      { emoji: '☸️', names: ['wheel', 'dharma', 'buddhism'] },
+      { emoji: '✡️', names: ['star', 'david', 'jewish'] },
+      { emoji: '🔯', names: ['star', 'hexagram'] },
+      { emoji: '🕎', names: ['menorah', 'jewish', 'hanukkah'] },
+      { emoji: '☯️', names: ['yin', 'yang', 'balance'] },
+      { emoji: '☦️', names: ['orthodox', 'cross', 'christian'] },
+      { emoji: '🛐', names: ['worship', 'pray', 'religion'] },
+      { emoji: '⛎', names: ['ophiuchus', 'zodiac'] },
+      { emoji: '♈', names: ['aries', 'zodiac', 'horoscope'] },
+      { emoji: '♉', names: ['taurus', 'zodiac', 'horoscope'] },
+      { emoji: '♊', names: ['gemini', 'zodiac', 'horoscope'] },
+      { emoji: '♋', names: ['cancer', 'zodiac', 'horoscope'] },
+      { emoji: '♌', names: ['leo', 'zodiac', 'horoscope'] },
+      { emoji: '♍', names: ['virgo', 'zodiac', 'horoscope'] },
+      { emoji: '♎', names: ['libra', 'zodiac', 'horoscope'] },
+      { emoji: '♏', names: ['scorpio', 'zodiac', 'horoscope'] },
+      { emoji: '♐', names: ['sagittarius', 'zodiac', 'horoscope'] },
+      { emoji: '♑', names: ['capricorn', 'zodiac', 'horoscope'] },
+      { emoji: '♒', names: ['aquarius', 'zodiac', 'horoscope'] },
+      { emoji: '♓', names: ['pisces', 'zodiac', 'horoscope'] },
+      { emoji: '🆔', names: ['id', 'identity', 'badge'] },
+      { emoji: '⚛️', names: ['atom', 'science', 'physics'] },
+      { emoji: '🉑', names: ['accept', 'chinese'] },
+      { emoji: '☢️', names: ['radioactive', 'nuclear', 'danger'] },
+      { emoji: '☣️', names: ['biohazard', 'danger', 'toxic'] },
+      { emoji: '📴', names: ['phone', 'off', 'mobile'] },
+      { emoji: '📳', names: ['vibration', 'phone', 'mode'] }
+    ],
+    'Flags': [
+      { emoji: '🏁', names: ['checkered', 'flag', 'racing', 'finish'] },
+      { emoji: '🚩', names: ['flag', 'red', 'triangular'] },
+      { emoji: '🎌', names: ['crossed', 'flags', 'japan'] },
+      { emoji: '🏴', names: ['black', 'flag', 'waving'] },
+      { emoji: '🏳️', names: ['white', 'flag', 'surrender'] },
+      { emoji: '🏳️‍🌈', names: ['rainbow', 'flag', 'pride', 'lgbtq'] },
+      { emoji: '🏴‍☠️', names: ['pirate', 'flag', 'jolly roger'] },
+      { emoji: '🇦🇫', names: ['afghanistan', 'flag'] },
+      { emoji: '🇦🇽', names: ['aland', 'islands', 'flag'] },
+      { emoji: '🇦🇱', names: ['albania', 'flag'] },
+      { emoji: '🇩🇿', names: ['algeria', 'flag'] },
+      { emoji: '🇦🇸', names: ['american', 'samoa', 'flag'] },
+      { emoji: '🇦🇩', names: ['andorra', 'flag'] },
+      { emoji: '🇦🇴', names: ['angola', 'flag'] },
+      { emoji: '🇦🇮', names: ['anguilla', 'flag'] },
+      { emoji: '🇦🇶', names: ['antarctica', 'flag'] },
+      { emoji: '🇦🇬', names: ['antigua', 'barbuda', 'flag'] },
+      { emoji: '🇦🇷', names: ['argentina', 'flag'] },
+      { emoji: '🇦🇲', names: ['armenia', 'flag'] },
+      { emoji: '🇦🇼', names: ['aruba', 'flag'] },
+      { emoji: '🇦🇺', names: ['australia', 'flag'] },
+      { emoji: '🇦🇹', names: ['austria', 'flag'] },
+      { emoji: '🇦🇿', names: ['azerbaijan', 'flag'] },
+      { emoji: '🇧🇸', names: ['bahamas', 'flag'] },
+      { emoji: '🇧🇭', names: ['bahrain', 'flag'] },
+      { emoji: '🇧🇩', names: ['bangladesh', 'flag'] },
+      { emoji: '🇧🇧', names: ['barbados', 'flag'] },
+      { emoji: '🇧🇾', names: ['belarus', 'flag'] },
+      { emoji: '🇧🇪', names: ['belgium', 'flag'] },
+      { emoji: '🇧🇿', names: ['belize', 'flag'] },
+      { emoji: '🇧🇯', names: ['benin', 'flag'] },
+      { emoji: '🇧🇲', names: ['bermuda', 'flag'] },
+      { emoji: '🇧🇹', names: ['bhutan', 'flag'] },
+      { emoji: '🇧🇴', names: ['bolivia', 'flag'] },
+      { emoji: '🇧🇦', names: ['bosnia', 'herzegovina', 'flag'] },
+      { emoji: '🇧🇼', names: ['botswana', 'flag'] },
+      { emoji: '🇧🇷', names: ['brazil', 'flag'] },
+      { emoji: '🇮🇴', names: ['british', 'indian', 'ocean', 'flag'] },
+      { emoji: '🇻🇬', names: ['british', 'virgin', 'islands', 'flag'] },
+      { emoji: '🇧🇳', names: ['brunei', 'flag'] },
+      { emoji: '🇧🇬', names: ['bulgaria', 'flag'] },
+      { emoji: '🇧🇫', names: ['burkina', 'faso', 'flag'] },
+      { emoji: '🇧🇮', names: ['burundi', 'flag'] },
+      { emoji: '🇰🇭', names: ['cambodia', 'flag'] },
+      { emoji: '🇨🇲', names: ['cameroon', 'flag'] },
+      { emoji: '🇨🇦', names: ['canada', 'flag'] },
+      { emoji: '🇮🇨', names: ['canary', 'islands', 'flag'] },
+      { emoji: '🇨🇻', names: ['cape', 'verde', 'flag'] },
+      { emoji: '🇧🇶', names: ['caribbean', 'netherlands', 'flag'] },
+      { emoji: '🇵🇰', names: ['pakistan', 'flag'] },
+      { emoji: '🇺🇸', names: ['usa', 'united states', 'america', 'flag'] },
+      { emoji: '🇬🇧', names: ['uk', 'united kingdom', 'britain', 'flag'] },
+      { emoji: '🇮🇳', names: ['india', 'flag'] },
+      { emoji: '🇨🇳', names: ['china', 'flag'] },
+      { emoji: '🇯🇵', names: ['japan', 'flag'] },
+      { emoji: '🇰🇷', names: ['korea', 'south', 'flag'] },
+      { emoji: '🇫🇷', names: ['france', 'flag'] },
+      { emoji: '🇩🇪', names: ['germany', 'flag'] },
+      { emoji: '🇮🇹', names: ['italy', 'flag'] },
+      { emoji: '🇪🇸', names: ['spain', 'flag'] },
+      { emoji: '🇷🇺', names: ['russia', 'flag'] },
+      { emoji: '🇸🇦', names: ['saudi', 'arabia', 'flag'] },
+      { emoji: '🇦🇪', names: ['uae', 'emirates', 'flag'] },
+      { emoji: '🇹🇷', names: ['turkey', 'flag'] }
+    ]
   };
+
+  const emojiCategories = Object.fromEntries(
+    Object.entries(emojiData).map(([category, emojis]) => [category, emojis.map(e => e.emoji)])
+  );
   const [selectedCategory, setSelectedCategory] = useState('Smileys & people');
   const [emojiSearch, setEmojiSearch] = useState('');
+
+  // Keep selectedChatRef in sync with selectedChat state
+  useEffect(() => {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
 
   // Socket.io setup
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (!token || !currentUser?._id) return;
+
     socketRef.current = io('http://localhost:5000', {
-      auth: { token }
+      auth: { token },
+      transports: ['websocket', 'polling']
     });
 
     socketRef.current.on('connect', () => {
-      console.log('Socket connected');
+      console.log('Socket connected, joining with userId:', currentUser._id);
+      // IMPORTANT: Emit join event to register this user's socket
+      socketRef.current.emit('join', currentUser._id);
+    });
+
+    socketRef.current.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
     });
 
     socketRef.current.on('receiveMessage', (data) => {
+      console.log('Received message via socket:', data);
       // data contains { conversationId, message }
       const message = data.message || data;
-      setMessages(prev => [...prev, message]);
+      const conversationId = data.conversationId;
+      
+      // Only add message if it's for the currently selected chat (use ref to avoid stale closure)
+      if (selectedChatRef.current?._id === conversationId) {
+        setMessages(prev => {
+          // Avoid duplicates
+          if (prev.some(m => m._id === message._id)) return prev;
+          return [...prev, message];
+        });
+        scrollToBottom();
+      }
+      // Always reload conversations to update sidebar
       loadConversations();
-      scrollToBottom();
     });
 
     socketRef.current.on('reactionAdded', ({ messageId, reaction }) => {
@@ -143,7 +607,7 @@ const Messages = () => {
 
     // Group chat socket listeners
     socketRef.current.on('groupMessage', ({ groupId, message }) => {
-      if (selectedChat?._id === groupId && chatType === 'group') {
+      if (selectedChatRef.current?._id === groupId && chatType === 'group') {
         setMessages(prev => [...prev, message]);
         scrollToBottom();
       }
@@ -156,7 +620,7 @@ const Messages = () => {
 
     socketRef.current.on('groupUpdated', (group) => {
       setGroups(prev => prev.map(g => g._id === group._id ? group : g));
-      if (selectedChat?._id === group._id) {
+      if (selectedChatRef.current?._id === group._id) {
         setSelectedChat(group);
       }
     });
@@ -181,7 +645,7 @@ const Messages = () => {
 
     socketRef.current.on('removedFromGroup', ({ groupId }) => {
       setGroups(prev => prev.filter(g => g._id !== groupId));
-      if (selectedChat?._id === groupId) {
+      if (selectedChatRef.current?._id === groupId) {
         setSelectedChat(null);
         setMessages([]);
       }
@@ -189,21 +653,21 @@ const Messages = () => {
 
     socketRef.current.on('groupDeleted', ({ groupId }) => {
       setGroups(prev => prev.filter(g => g._id !== groupId));
-      if (selectedChat?._id === groupId) {
+      if (selectedChatRef.current?._id === groupId) {
         setSelectedChat(null);
         setMessages([]);
       }
     });
 
     socketRef.current.on('userTyping', ({ conversationId, userId, userName }) => {
-      if (selectedChat?._id === conversationId && userId !== currentUser._id) {
+      if (selectedChatRef.current?._id === conversationId && userId !== currentUser._id) {
         setIsTyping(true);
         setTypingUser({ _id: userId, name: userName });
       }
     });
 
     socketRef.current.on('userStoppedTyping', ({ conversationId, userId }) => {
-      if (selectedChat?._id === conversationId && userId !== currentUser._id) {
+      if (selectedChatRef.current?._id === conversationId && userId !== currentUser._id) {
         setIsTyping(false);
         setTypingUser(null);
       }
@@ -232,9 +696,18 @@ const Messages = () => {
     });
 
     socketRef.current.on('messagesSeen', ({ conversationId }) => {
-      if (selectedChat?._id === conversationId) {
+      if (selectedChatRef.current?._id === conversationId) {
         setMessages(prev => prev.map(msg => ({ ...msg, read: true, seenAt: new Date() })));
       }
+    });
+
+    // Handle conversation updates (for real-time sidebar updates)
+    socketRef.current.on('conversationUpdated', ({ conversationId, lastMessage, lastMessageTime }) => {
+      setConversations(prev => prev.map(conv => 
+        conv._id === conversationId 
+          ? { ...conv, lastMessage, lastMessageTime, unreadCount: (conv.unreadCount || 0) + 1 }
+          : conv
+      ));
     });
 
     return () => {
@@ -243,7 +716,7 @@ const Messages = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedChat]);
+  }, [currentUser?._id]);
 
   // Auto-detect away status based on user inactivity
   useEffect(() => {
@@ -306,7 +779,11 @@ const Messages = () => {
 
   const getFilteredEmojis = () => {
     if (emojiSearch) {
-      return Object.values(emojiCategories).flat().filter(emoji => emoji.includes(emojiSearch));
+      const searchLower = emojiSearch.toLowerCase();
+      // Search across all categories by emoji names
+      return Object.values(emojiData).flat().filter(item => 
+        item.names.some(name => name.toLowerCase().includes(searchLower))
+      ).map(item => item.emoji);
     }
     return emojiCategories[selectedCategory];
   };
@@ -330,30 +807,8 @@ const Messages = () => {
 
   // Restore last selected chat when conversations/groups are loaded
   useEffect(() => {
-    if (selectedChat || location.state?.friendId) return; // Don't restore if already selected
-    
-    const lastChat = localStorage.getItem('lastSelectedChat');
-    if (!lastChat) return;
-    
-    if (conversations.length === 0 && groups.length === 0) return; // Wait for data to load
-    
-    try {
-      const { chatId, type } = JSON.parse(lastChat);
-      
-      if (type === 'direct' && conversations.length > 0) {
-        const conv = conversations.find(c => c._id === chatId);
-        if (conv) {
-          handleSelectChat(conv, 'direct');
-        }
-      } else if (type === 'group' && groups.length > 0) {
-        const grp = groups.find(g => g._id === chatId);
-        if (grp) {
-          handleSelectChat(grp, 'group');
-        }
-      }
-    } catch (error) {
-      console.error('Error restoring last chat:', error);
-    }
+    // Don't auto-open any chat - only open when explicitly clicked
+    // This useEffect can be removed or simplified
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, groups]);
 
@@ -525,11 +980,12 @@ const Messages = () => {
       
       setMessages([...messages, sentMessage]);
       setShowVoiceRecorder(false);
+      toast.success('✓ Voice message sent', { duration: 2000 });
       loadConversations();
       scrollToBottom();
     } catch (error) {
       console.error('Error sending voice message:', error);
-      alert('Failed to send voice message');
+      toast.error('Failed to send voice message');
     }
   };
 
@@ -621,11 +1077,11 @@ const Messages = () => {
 
     try {
       await forwardMessage(forwardingMessage._id, conversationIds);
-      alert(`Message forwarded to ${conversationIds.length} conversation(s)`);
+      toast.success(`✓ Message forwarded to ${conversationIds.length} conversation(s)`, { duration: 3000 });
       setForwardingMessage(null);
     } catch (error) {
       console.error('Error forwarding message:', error);
-      alert('Failed to forward message');
+      toast.error('Failed to forward message');
     }
   };
 
@@ -865,7 +1321,7 @@ const Messages = () => {
               <span className="conv-time">{formatTime(item.lastMessageTime || item.updatedAt)}</span>
             </div>
             <div className="conv-preview">
-              <span className="last-message">{item.lastMessage || `${item.members?.length || 0} members`}</span>
+              <span className={`last-message ${item.lastMessage?.includes('▁') ? 'voice-message' : ''}`}>{item.lastMessage || `${item.members?.length || 0} members`}</span>
             </div>
           </div>
         </div>
@@ -881,9 +1337,9 @@ const Messages = () => {
       >
         <div className="conv-avatar">
           {item.participant?.profilePicture ? (
-            <img src={item.participant.profilePicture} alt={item.participant.name} />
+            <img src={item.participant.profilePicture.startsWith('http') ? item.participant.profilePicture : `http://localhost:5000${item.participant.profilePicture}`} alt={item.participant.name || 'User'} />
           ) : (
-            item.participant?.name?.charAt(0).toUpperCase()
+            <span className="avatar-initial">{(item.participant?.name || 'U').charAt(0).toUpperCase()}</span>
           )}
           {(() => {
             const presence = getUserPresence(item.participant?._id);
@@ -895,11 +1351,13 @@ const Messages = () => {
         </div>
         <div className="conv-info">
           <div className="conv-header">
-            <span className={`conv-name ${item.unreadCount > 0 ? 'unread' : ''}`}>{item.participant?.name}</span>
+            <span className={`conv-name ${item.unreadCount > 0 ? 'unread' : ''}`}>
+              {item.participant?.name || (typeof item.participant === 'string' ? 'Loading...' : 'Unknown User')}
+            </span>
             <span className="conv-time">{formatTime(item.lastMessageTime)}</span>
           </div>
           <div className="conv-preview">
-            <span className={`last-message ${item.unreadCount > 0 ? 'unread' : ''}`}>
+            <span className={`last-message ${item.unreadCount > 0 ? 'unread' : ''} ${item.lastMessage?.includes('🎤') ? 'voice-message' : ''}`}>
               {item.lastMessage || 'No messages yet'}
             </span>
             {item.unreadCount > 0 && (
@@ -1021,7 +1479,7 @@ const Messages = () => {
                       }}
                     >
                       {selectedChat.participant?.profilePicture ? (
-                        <img src={selectedChat.participant.profilePicture} alt={selectedChat.participant.name} />
+                        <img src={selectedChat.participant.profilePicture.startsWith('http') ? selectedChat.participant.profilePicture : `http://localhost:5000${selectedChat.participant.profilePicture}`} alt={selectedChat.participant.name} />
                       ) : (
                         selectedChat.participant?.name?.charAt(0).toUpperCase()
                       )}

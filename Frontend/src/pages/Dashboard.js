@@ -5,6 +5,9 @@ import PostCard from '../components/PostCard';
 import StoryViewer from '../components/StoryViewer';
 import NotificationCenter from '../components/NotificationCenter';
 import { searchUsers, getUnreadNotificationsCount } from '../api';
+import AddIcon from '@mui/icons-material/Add';
+import GroupsIcon from '@mui/icons-material/Groups';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -241,7 +244,6 @@ What's your favorite JS feature?`,
       
       try {
         const storiesData = await getStories();
-        console.log('Stories API response:', storiesData.data);
         
         // Transform stories data for display
         if (storiesData.data && Array.isArray(storiesData.data)) {
@@ -583,13 +585,13 @@ What's your favorite JS feature?`,
           )}
         </div>
         <div className="header-actions">
-          <button className="icon-button" onClick={() => history.push('/connections')}>👥</button>
+          <button className="icon-button" onClick={() => history.push('/connections')}><GroupsIcon /></button>
           <div className="notification-container">
             <button 
               className="icon-button notification-btn" 
               onClick={() => setShowNotificationCenter(true)}
             >
-              🔔
+              <NotificationsIcon />
               {unreadCount > 0 && (
                 <span className="notification-count-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
               )}
@@ -632,7 +634,7 @@ What's your favorite JS feature?`,
           {/* Stories Section */}
           <div className="stories-section">
             <div className="story-card create-story" onClick={() => history.push('/create-story')}>
-              <div className="story-plus">+</div>
+              <div className="story-plus"><AddIcon /></div>
               <span>Create Story</span>
             </div>
             {stories.map((story, index) => (

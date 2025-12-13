@@ -182,7 +182,7 @@ const NotificationCenter = ({ isOpen, onClose }) => {
                   <div className="notification-icon-wrapper">
                     {notif.sender?.profilePicture ? (
                       <img 
-                        src={notif.sender.profilePicture} 
+                        src={notif.sender.profilePicture.startsWith('http') ? notif.sender.profilePicture : `http://localhost:5000${notif.sender.profilePicture}`}
                         alt={notif.sender?.name}
                         className="notification-avatar-center"
                       />

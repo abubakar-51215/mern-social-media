@@ -12,16 +12,20 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
   const [showReactions, setShowReactions] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
   const [selectedPollOption, setSelectedPollOption] = useState(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [pollResults, setPollResults] = useState(null);
   const [questionAnswer, setQuestionAnswer] = useState('');
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [isAnswerLoading, setIsAnswerLoading] = useState(false);
   const [showViewers, setShowViewers] = useState(false);
   const [viewers, setViewers] = useState([]);
   const [loadingViewers, setLoadingViewers] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const audioRef = useRef(null);
+  const viewedStoriesRef = useRef(new Set()); // Track which stories have been viewed
 
   const currentStory = stories[currentStoryIndex];
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -29,7 +33,7 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
   // Check if this is the user's own story
   const isOwnStory = currentStory?.userId && (currentStory.userId === currentUser._id || currentStory.userId === currentUser.id);
   
-  const STORY_DURATION = 5000; // 5 seconds per story
+  const STORY_DURATION = 30000; // 30 seconds per story
   const reactionEmojis = ['❤️', '😂', '😮', '😢', '😡', '👏', '🔥', '🎉'];
 
   // Music playback functions
@@ -83,6 +87,7 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
     setPollResults(null);
     setQuestionAnswer('');
     setHasAnswered(false);
+    setIsAnswerLoading(false);
     
     // If it's own story and it's a poll, calculate and show results
     if (currentStory?.type === 'poll' && currentStory?.poll?.options && isOwnStory) {
@@ -187,12 +192,12 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
     
     try {
       await replyToStory(currentStory.id, replyText);
+      toast.success('✓ Message sent! They will see it in their chat', { duration: 3000 });
       setReplyText('');
       setShowReplyInput(false);
-      toast.success('Reply sent!');
     } catch (error) {
       console.error('Error sending reply:', error);
-      toast.error('Failed to send reply');
+      toast.error('Failed to send message');
     }
   };
 
@@ -250,20 +255,35 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
 
   // Handle question answer
   const handleQuestionSubmit = async () => {
-    if (!questionAnswer.trim() || hasAnswered || isOwnStory) return;
+    console.log('handleQuestionSubmit called', { questionAnswer, hasAnswered, isOwnStory, storyId: currentStory.id });
+    
+    if (!questionAnswer.trim() || hasAnswered || isOwnStory) {
+      console.log('Early return:', { isTrimmed: questionAnswer.trim(), hasAnswered, isOwnStory });
+      return;
+    }
+    
     if (!isValidObjectId(currentStory.id)) {
       toast.error('Cannot answer sample story');
       return;
     }
     
+    setIsAnswerLoading(true);
     try {
-      await answerQuestion(currentStory.id, questionAnswer);
+      console.log('Calling answerQuestion API with:', { storyId: currentStory.id, answer: questionAnswer });
+      const response = await answerQuestion(currentStory.id, questionAnswer);
+      console.log('API Response:', response);
+      
       setHasAnswered(true);
-      toast.success('Answer sent!');
+      setShowSuccessModal(true);
+      toast.success('✓ Answer sent successfully!', { duration: 3000 });
       setQuestionAnswer('');
     } catch (error) {
       console.error('Error answering:', error);
-      toast.error(error.response?.data?.message || 'Failed to send answer');
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to send answer';
+      console.error('Full error details:', { status: error.response?.status, data: error.response?.data });
+      toast.error(errorMsg);
+    } finally {
+      setIsAnswerLoading(false);
     }
   };
 
@@ -290,11 +310,17 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
   };
 
   // Mark story as viewed when opened
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (currentStory && currentStory.id && !isOwnStory && isValidObjectId(currentStory.id)) {
-      viewStory(currentStory.id).catch(console.error);
+      // Only call viewStory once per story
+      if (!viewedStoriesRef.current.has(currentStory.id)) {
+        viewedStoriesRef.current.add(currentStory.id);
+        viewStory(currentStory.id).catch(console.error);
+      }
     }
-  }, [currentStory, isOwnStory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStoryIndex]);
 
   if (!currentStory) return null;
 
@@ -377,22 +403,27 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
                       onChange={(e) => setQuestionAnswer(e.target.value)}
                       onClick={(e) => e.stopPropagation()}
                       onMouseDown={(e) => e.stopPropagation()}
-                      onKeyPress={(e) => e.key === 'Enter' && handleQuestionSubmit()}
+                      onKeyPress={(e) => e.key === 'Enter' && !isAnswerLoading && handleQuestionSubmit()}
+                      disabled={isAnswerLoading}
                     />
                     <button 
                       className="question-submit-btn"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
+                        console.log('🔴 Send button clicked!');
+                        console.log('Current state:', { questionAnswer, hasAnswered, isAnswerLoading, isOwnStory });
                         handleQuestionSubmit();
                       }}
-                      disabled={!questionAnswer.trim()}
+                      disabled={!questionAnswer.trim() || isAnswerLoading}
+                      type="button"
                     >
-                      Send
+                      {isAnswerLoading ? '⏳ Sending...' : '📤 Send'}
                     </button>
                   </div>
                 ) : !isOwnStory && hasAnswered ? (
                   <div className="question-answered">
-                    <span>✓ Answer sent!</span>
+                    <span>✓ Answer sent to chat!</span>
                   </div>
                 ) : null}
               </div>
@@ -462,7 +493,7 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
           )}
 
           {/* Music Badge - Instagram Style */}
-          {currentStory?.music && (
+          {currentStory?.music?.trackName && currentStory?.music?.previewUrl && (
             <>
               <div className="story-music-display" onClick={toggleMusic}>
                 {currentStory.music.albumArt && (
@@ -553,8 +584,62 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
               <span>❤️ {currentStory.reactions.length} reactions</span>
             )}
             {currentStory.replies?.length > 0 && (
-              <span>💬 {currentStory.replies.length} replies</span>
+              <span 
+                style={{ cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowReplies(!showReplies);
+                  setIsPaused(true);
+                }}
+              >
+                💬 {currentStory.replies.length} replies
+              </span>
             )}
+          </div>
+        )}
+
+        {/* Story Replies List */}
+        {isOwnStory && showReplies && currentStory.replies?.length > 0 && (
+          <div className="story-replies-panel" onClick={(e) => e.stopPropagation()}>
+            <div className="replies-header">
+              <h3>Replies ({currentStory.replies.length})</h3>
+              <button 
+                className="replies-close-btn"
+                onClick={() => {
+                  setShowReplies(false);
+                  setIsPaused(false);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="replies-list">
+              {currentStory.replies.map((reply, index) => (
+                <div key={index} className="reply-item">
+                  {reply.user?.profilePicture ? (
+                    <img 
+                      src={reply.user.profilePicture.startsWith('http') 
+                        ? reply.user.profilePicture 
+                        : `http://localhost:5000${reply.user.profilePicture}`
+                      } 
+                      alt={reply.user.name}
+                      className="reply-avatar"
+                    />
+                  ) : (
+                    <div className="reply-avatar-placeholder">
+                      {reply.user?.name?.charAt(0).toUpperCase() || '?'}
+                    </div>
+                  )}
+                  <div className="reply-content">
+                    <div className="reply-header-info">
+                      <strong>{reply.user?.name || 'Anonymous'}</strong>
+                      <span className="reply-time">{new Date(reply.createdAt).toLocaleTimeString()}</span>
+                    </div>
+                    <p className="reply-text">{reply.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -609,6 +694,27 @@ const StoryViewer = ({ stories, initialIndex = 0, onClose, onDelete }) => {
                 ) : (
                   <div className="no-viewers">No viewers yet</div>
                 )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Modal */}
+        {showSuccessModal && (
+          <div className="success-modal-overlay" onClick={() => setShowSuccessModal(false)}>
+            <div className="success-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="success-modal-content">
+                <div className="success-icon">✓</div>
+                <h2 className="success-title">Answer Sent!</h2>
+                <p className="success-message">
+                  Your answer has been sent to the story owner. They'll see it in their chat.
+                </p>
+                <button 
+                  className="success-button"
+                  onClick={() => setShowSuccessModal(false)}
+                >
+                  Got it
+                </button>
               </div>
             </div>
           </div>

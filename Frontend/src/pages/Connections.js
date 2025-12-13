@@ -276,7 +276,7 @@ const Connections = () => {
                     <div key={friend._id} className="connection-card">
                       <div className="user-avatar">
                         {friend.profilePicture ? (
-                          <img src={friend.profilePicture} alt={friend.name} />
+                          <img src={friend.profilePicture.startsWith('http') ? friend.profilePicture : `http://localhost:5000${friend.profilePicture}`} alt={friend.name} />
                         ) : (
                           friend.name.charAt(0).toUpperCase()
                         )}
@@ -311,7 +311,7 @@ const Connections = () => {
                     <div key={request._id} className="connection-card">
                       <div className="user-avatar">
                         {request.profilePicture ? (
-                          <img src={request.profilePicture} alt={request.name} />
+                          <img src={request.profilePicture.startsWith('http') ? request.profilePicture : `http://localhost:5000${request.profilePicture}`} alt={request.name} />
                         ) : (
                           request.name.charAt(0).toUpperCase()
                         )}
@@ -343,7 +343,7 @@ const Connections = () => {
                     <div key={request._id} className="connection-card">
                       <div className="user-avatar">
                         {request.profilePicture ? (
-                          <img src={request.profilePicture} alt={request.name} />
+                          <img src={request.profilePicture.startsWith('http') ? request.profilePicture : `http://localhost:5000${request.profilePicture}`} alt={request.name} />
                         ) : (
                           request.name.charAt(0).toUpperCase()
                         )}
@@ -370,7 +370,7 @@ const Connections = () => {
                     <div key={user._id} className="connection-card">
                       <div className="user-avatar">
                         {user.profilePicture ? (
-                          <img src={user.profilePicture} alt={user.name} />
+                          <img src={user.profilePicture.startsWith('http') ? user.profilePicture : `http://localhost:5000${user.profilePicture}`} alt={user.name} />
                         ) : (
                           user.name.charAt(0).toUpperCase()
                         )}

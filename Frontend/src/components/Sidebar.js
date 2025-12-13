@@ -1,6 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
 import io from 'socket.io-client';
+import HomeIcon from '@mui/icons-material/Home';
+import ChatIcon from '@mui/icons-material/Chat';
+import PeopleIcon from '@mui/icons-material/People';
+import ExploreIcon from '@mui/icons-material/Explore';
+import PersonIcon from '@mui/icons-material/Person';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CreateIcon from '@mui/icons-material/Create';
+import BoltIcon from '@mui/icons-material/Bolt';
+import LogoutIcon from '@mui/icons-material/Logout';
+import QrCodeIcon from '@mui/icons-material/QrCode';
+import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import './Sidebar.css';
 import ManageAccount from './ManageAccount';
 import QRCodeModal from './QRCodeModal';
@@ -162,20 +175,20 @@ const Sidebar = () => {
     };
 
     const menuItems = [
-        { path: '/dashboard', icon: '🏠', label: 'Feed', badge: null },
-        { path: '/messages', icon: '💬', label: 'Messages', badge: unreadMessages },
-        { path: '/connections', icon: '👥', label: 'Connections', badge: friendRequests },
-        { path: '/discover', icon: '🔍', label: 'Discover', badge: null },
-        { path: '/profile', icon: '👤', label: 'Profile', badge: null },
-        { path: '/settings', icon: '⚙️', label: 'Settings', badge: null },
-        { path: '/create-post', icon: '✏️', label: 'Create Post', badge: null, isButton: true }
+        { path: '/dashboard', icon: <HomeIcon />, label: 'Feed', badge: null },
+        { path: '/messages', icon: <ChatIcon />, label: 'Messages', badge: unreadMessages },
+        { path: '/connections', icon: <PeopleIcon />, label: 'Connections', badge: friendRequests },
+        { path: '/discover', icon: <ExploreIcon />, label: 'Discover', badge: null },
+        { path: '/profile', icon: <PersonIcon />, label: 'Profile', badge: null },
+        { path: '/settings', icon: <SettingsIcon />, label: 'Settings', badge: null },
+        { path: '/create-post', icon: <CreateIcon />, label: 'Create Post', badge: null, isButton: true }
     ];
 
     return (
         <div className="sidebar">
             <div className="sidebar-header">
                 <Link to="/dashboard" className="logo">
-                    <span className="logo-icon">⚡</span>
+                    <span className="logo-icon"><BoltIcon /></span>
                     <span className="logo-text">pingup</span>
                 </Link>
             </div>
@@ -243,25 +256,25 @@ const Sidebar = () => {
                                     setShowUserMenu(false);
                                     setShowManageAccount(true);
                                 }}>
-                                    <span className="menu-icon">⚙️</span>
+                                    <span className="menu-icon"><SettingsIcon fontSize="small" /></span>
                                     <span>Manage account</span>
                                 </button>
                                 <button className="menu-action-item" onClick={() => {
                                     setShowUserMenu(false);
                                     setShowQRModal(true);
                                 }}>
-                                    <span className="menu-icon">📱</span>
+                                    <span className="menu-icon"><QrCodeIcon fontSize="small" /></span>
                                     <span>My QR Code</span>
                                 </button>
                                 <button className="menu-action-item" onClick={() => {
                                     setShowUserMenu(false);
                                     setShowQRScanner(true);
                                 }}>
-                                    <span className="menu-icon">📷</span>
+                                    <span className="menu-icon"><QrCodeScannerIcon fontSize="small" /></span>
                                     <span>Scan QR Code</span>
                                 </button>
                                 <div className="menu-action-item theme-toggle-menu">
-                                    <span className="menu-icon">🌙</span>
+                                    <span className="menu-icon">{theme === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}</span>
                                     <span>Dark Mode</span>
                                     <label className="toggle-switch">
                                         <input 
@@ -278,7 +291,7 @@ const Sidebar = () => {
                                     </label>
                                 </div>
                                 <button className="menu-action-item" onClick={handleSignOut}>
-                                    <span className="menu-icon">🚪</span>
+                                    <span className="menu-icon"><LogoutIcon fontSize="small" /></span>
                                     <span>Sign out</span>
                                 </button>
                             </div>

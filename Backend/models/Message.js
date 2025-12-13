@@ -85,6 +85,19 @@ const messageSchema = new mongoose.Schema(
     },
     editedAt: {
       type: Date
+    },
+    isStoryReply: {
+      type: Boolean,
+      default: false
+    },
+    storyId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Story',
+      default: null
+    },
+    questionText: {
+      type: String,
+      default: null
     }
   },
   { timestamps: true } // adds createdAt and updatedAt

@@ -311,7 +311,7 @@
 .action-btn {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 10%;
   border: none;
   cursor: pointer;
   font-size: 0.9rem;

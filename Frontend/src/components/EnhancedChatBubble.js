@@ -4,17 +4,146 @@ import { toast } from './Toast';
 import './EnhancedChatBubble.css';
 
 const EnhancedChatBubble = ({ message, isCurrentUser, currentUser, onDelete, onForward, onEdit, activeReactionId, setActiveReactionId, isGroupChat, showSenderName, onViewProfile, onReactionUpdate }) => {
+  const WAVE_WIDTH = 260;
+  const WAVE_HEIGHT = 60;
+  const BAR_COUNT = 40;
+  const BASELINE_Y = 30;
   const [showOptions, setShowOptions] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.text || '');
+  const [estimatedDuration, setEstimatedDuration] = useState(0);
+  const [actualDuration, setActualDuration] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
   const isOwn = isCurrentUser;
   const audioRef = useRef(null);
   const editInputRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const reactionRef = useRef(null);
   
   // Check if this message's reaction picker is open
   const showReactions = activeReactionId === message._id;
+
+  // Format duration helper
+  const formatDuration = (seconds) => {
+    if (!seconds || isNaN(seconds) || !isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Load audio metadata on the inline audio element and compute actual duration
+  useEffect(() => {
+    if (!(message.messageType === 'audio' && message.audio)) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Show a quick estimate immediately from file size (~50KB/sec) while metadata loads
+    if (message.fileSize && message.fileSize > 0) {
+      const estimated = Math.ceil(message.fileSize / 50000);
+      setEstimatedDuration(estimated);
+    }
+
+    const handleLoadedMetadata = () => {
+      const dur = audio.duration;
+      if (!isNaN(dur) && isFinite(dur) && dur > 0) {
+        setActualDuration(dur);
+      }
+    };
+
+    const handleCanPlay = () => {
+      const dur = audio.duration;
+      if (!isNaN(dur) && isFinite(dur) && dur > 0) {
+        setActualDuration(dur);
+      }
+    };
+
+    const handleEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    const handleError = (e) => {
+      // Non-fatal: keep estimated duration if available
+      console.warn('Audio inline error:', {
+        code: e.target?.error?.code,
+        message: e.target?.error?.message,
+        src: e.target?.currentSrc
+      });
+    };
+
+    const handleTimeUpdate = () => {
+      setCurrentTime(audio.currentTime || 0);
+    };
+
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.preload = 'metadata';
+    audio.load();
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+    };
+  }, [message.audio, message.messageType, message.fileSize]);
+
+  const togglePlayback = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    try {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        audio.currentTime = 0;
+        audio.playbackRate = 1.0;
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.then === 'function') {
+          playPromise
+            .then(() => {
+              setIsPlaying(true);
+            })
+            .catch((err) => {
+              if (err?.name === 'AbortError') {
+                // Non-fatal
+                setIsPlaying(true);
+              } else {
+                console.error('Inline play error:', err);
+                setIsPlaying(false);
+              }
+            });
+        } else {
+          setIsPlaying(true);
+        }
+      }
+    } catch (e) {
+      console.error('togglePlayback error:', e);
+      setIsPlaying(false);
+    }
+  };
+
+  const handleWaveSeek = (e) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    const total = actualDuration || audio.duration || estimatedDuration || 0;
+    if (total <= 0) return;
+    const pct = Math.min(Math.max(clickX / width, 0), 1);
+    const newTime = pct * total;
+    try {
+      audio.currentTime = newTime;
+      setCurrentTime(newTime);
+    } catch (err) {
+      console.warn('Seek error:', err);
+    }
+  };
 
   // Focus edit input when editing starts
   useEffect(() => {
@@ -159,17 +288,6 @@ const EnhancedChatBubble = ({ message, isCurrentUser, currentUser, onDelete, onF
     return messageAge <= maxEditTime;
   };
 
-  const playAudio = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
   const formatTime = (date) => {
     return new Date(date).toLocaleTimeString('en-US', { 
       hour: '2-digit', 
@@ -289,17 +407,93 @@ const EnhancedChatBubble = ({ message, isCurrentUser, currentUser, onDelete, onF
                 
                 {message.messageType === 'audio' && message.audio && (
                   <div className="message-audio">
-                    <button className="audio-play-btn" onClick={playAudio}>
+                    <button 
+                      className="audio-play-btn" 
+                      onClick={togglePlayback}
+                      title={isPlaying ? 'Pause' : 'Play'}
+                    >
                       {isPlaying ? '⏸️' : '▶️'}
                     </button>
-                    <div className="audio-wave">
-                      <span className="wave-bar"></span>
-                      <span className="wave-bar"></span>
-                      <span className="wave-bar"></span>
-                      <span className="wave-bar"></span>
-                      <span className="wave-bar"></span>
+                    <div className="audio-waveform" onClick={handleWaveSeek}>
+                      {/* Base wave - gray bars */}
+                      <svg className="wave-base" viewBox={`0 0 ${WAVE_WIDTH} ${WAVE_HEIGHT}`} preserveAspectRatio="none">
+                        {Array.from({ length: BAR_COUNT }, (_, i) => {
+                          const t = i / BAR_COUNT;
+                          const amplitude = 0.25 + 0.75 * Math.abs(Math.sin(2.6 * Math.PI * t)) * (0.6 + 0.4 * Math.sin(0.8 * Math.PI * t));
+                          const h = 8 + amplitude * 32; // bar height
+                          const x = 4 + i * ((WAVE_WIDTH - 8) / BAR_COUNT);
+                          const y1 = BASELINE_Y - h / 2;
+                          const y2 = BASELINE_Y + h / 2;
+                          return (
+                            <line
+                              key={`base-${i}`}
+                              x1={x}
+                              y1={y1}
+                              x2={x}
+                              y2={y2}
+                              strokeWidth="2.5"
+                              strokeLinecap="round"
+                            />
+                          );
+                        })}
+                      </svg>
+                      {/* Fill wave - colored bars showing progress */}
+                      {(() => {
+                        const audio = audioRef.current;
+                        const total = actualDuration || audio?.duration || estimatedDuration || 0;
+                        const pct = total > 0 ? Math.min(Math.max((currentTime / total) * 100, 0), 100) : 0;
+                        return (
+                          <div className="wave-fill" style={{ width: `${pct}%` }}>
+                            <svg viewBox={`0 0 ${WAVE_WIDTH} ${WAVE_HEIGHT}`} preserveAspectRatio="none">
+                              {Array.from({ length: BAR_COUNT }, (_, i) => {
+                                const t = i / BAR_COUNT;
+                                const amplitude = 0.25 + 0.75 * Math.abs(Math.sin(2.6 * Math.PI * t)) * (0.6 + 0.4 * Math.sin(0.8 * Math.PI * t));
+                                const h = 8 + amplitude * 32;
+                                const x = 4 + i * ((WAVE_WIDTH - 8) / BAR_COUNT);
+                                const y1 = BASELINE_Y - h / 2;
+                                const y2 = BASELINE_Y + h / 2;
+                                return (
+                                  <line
+                                    key={`fill-${i}`}
+                                    x1={x}
+                                    y1={y1}
+                                    x2={x}
+                                    y2={y2}
+                                    strokeWidth="2.5"
+                                    strokeLinecap="round"
+                                  />
+                                );
+                              })}
+                            </svg>
+                          </div>
+                        );
+                      })()}
+                      {/* Playback position thumb */}
+                      {(() => {
+                        const audio = audioRef.current;
+                        const total = actualDuration || audio?.duration || estimatedDuration || 0;
+                        const pct = total > 0 ? Math.min(Math.max((currentTime / total) * 100, 0), 100) : 0;
+                        const left = (pct / 100) * 100;
+                        return <div className="wave-thumb" style={{ left: `${left}%` }} />;
+                      })()}
                     </div>
-                    <audio ref={audioRef} src={`http://localhost:5000${message.audio}`} />
+                    <div className="audio-duration">
+                      {actualDuration > 0 
+                        ? formatDuration(actualDuration)
+                        : estimatedDuration > 0
+                        ? formatDuration(estimatedDuration)
+                        : '0:00'
+                      }
+                    </div>
+                    <audio 
+                      ref={audioRef}
+                      preload="metadata"
+                      onPlay={() => { const a = audioRef.current; if (a) a.playbackRate = 1.0; }}
+                    >
+                      <source src={`http://localhost:5000${message.audio}`} type="audio/webm" />
+                      <source src={`http://localhost:5000${message.audio}`} type="audio/ogg" />
+                      <source src={`http://localhost:5000${message.audio}`} type="audio/mpeg" />
+                    </audio>
                   </div>
                 )}
 
@@ -337,7 +531,24 @@ const EnhancedChatBubble = ({ message, isCurrentUser, currentUser, onDelete, onF
                 )}
                 
                 {message.text && !isEditing && (
-                  <span className="message-text">{message.text}</span>
+                  <>
+                    {message.isStoryReply && (
+                      <div className="story-reply-context">
+                        <div className="story-context-label">Replied to your story</div>
+                        {message.questionText && (
+                          <div className="story-question-text">
+                            {message.questionText}
+                          </div>
+                        )}
+                        <div className="story-context-message">
+                          {message.text}
+                        </div>
+                      </div>
+                    )}
+                    {!message.isStoryReply && (
+                      <span className="message-text">{message.text}</span>
+                    )}
+                  </>
                 )}
                 
                 {isEditing && (
@@ -417,6 +628,8 @@ const EnhancedChatBubble = ({ message, isCurrentUser, currentUser, onDelete, onF
           )}
         </div>
       </div>
+
+      {/* Inline player only; popup removed */}
     </div>
   );
 };

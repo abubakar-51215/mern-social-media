@@ -2,6 +2,22 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useHistory } from 'react-router-dom';
 import { toast } from './Toast';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import MessageIcon from '@mui/icons-material/Message';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import XIcon from '@mui/icons-material/X';
+import IosShareIcon from '@mui/icons-material/IosShare';
 import './PostCard.css';
 
 const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
@@ -91,27 +107,21 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
     // Music playback functions
     const playMusic = React.useCallback(() => {
         const musicUrl = post.music?.previewUrl || post.music?.preview_url;
-        console.log('playMusic called for post:', post._id, 'musicUrl:', musicUrl);
         
         if (!musicUrl) {
-            console.log('No music URL available');
             return;
         }
 
         try {
             if (!audioRef.current) {
-                console.log('Creating new Audio element');
                 audioRef.current = new Audio(musicUrl);
                 audioRef.current.loop = true;
                 audioRef.current.volume = 0.7; // Set volume to 70%
                 
-                // Add event listeners for debugging
                 audioRef.current.addEventListener('play', () => {
-                    console.log('Audio started playing');
                     setIsMusicPlaying(true);
                 });
                 audioRef.current.addEventListener('pause', () => {
-                    console.log('Audio paused');
                     setIsMusicPlaying(false);
                 });
                 audioRef.current.addEventListener('error', (e) => {
@@ -119,23 +129,19 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                 });
             }
             
-            console.log('Attempting to play audio');
             audioRef.current.play()
                 .then(() => {
-                    console.log('Audio play promise resolved');
                     setIsMusicPlaying(true);
                 })
                 .catch(err => {
-                    console.warn('Auto-play prevented by browser:', err.message);
-                    // Show a small indicator that user needs to interact
+                    // Auto-play prevented by browser - user needs to interact
                 });
         } catch (error) {
             console.error('Error in playMusic:', error);
         }
-    }, [post.music, post._id]);
+    }, [post.music]);
 
     const pauseMusic = React.useCallback(() => {
-        console.log('pauseMusic called');
         if (audioRef.current) {
             audioRef.current.pause();
             setIsMusicPlaying(false);
@@ -154,22 +160,17 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
     useEffect(() => {
         const musicUrl = post.music?.previewUrl || post.music?.preview_url;
         if (!musicUrl) {
-            console.log('No music URL for post:', post._id);
             return;
         }
 
-        console.log('Setting up music auto-play for post:', post._id, 'URL:', musicUrl);
         const currentPost = postRef.current;
         
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
-                    console.log('Post visibility changed:', post._id, 'isIntersecting:', entry.isIntersecting);
                     if (entry.isIntersecting) {
-                        console.log('Post is in view, playing music');
                         playMusic();
                     } else {
-                        console.log('Post is out of view, pausing music');
                         pauseMusic();
                     }
                 });
@@ -768,7 +769,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
             {post.music && (
                 <div className="post-music">
                     <div className="music-player">
-                        <span className={`music-icon-pulse ${isMusicPlaying ? 'playing' : ''}`}>🎵</span>
+                        <span className={`music-icon-pulse ${isMusicPlaying ? 'playing' : ''}`}><MusicNoteIcon /></span>
                         <div className="music-info-display">
                             <div className="music-title-display">{post.music.trackName || post.music.title || 'Unknown Track'}</div>
                             <div className="music-artist-display">{post.music.artistName || post.music.artist || 'Unknown Artist'}</div>
@@ -779,7 +780,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                                 onClick={toggleMusic}
                                 title={isMusicPlaying ? "Pause music" : "Play music"}
                             >
-                                {isMusicPlaying ? '⏸' : '▶️'}
+                                {isMusicPlaying ? <PauseIcon /> : <PlayArrowIcon />}
                             </button>
                         ) : (
                             <button 
@@ -787,7 +788,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                                 onClick={() => window.open(`https://open.spotify.com/search/${encodeURIComponent(`${post.music.trackName || post.music.title} ${post.music.artistName || post.music.artist}`)}`, '_blank')}
                                 title="Open in Spotify"
                             >
-                                🎧
+                                <MusicNoteIcon />
                             </button>
                         )}
                     </div>
@@ -906,14 +907,14 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     className={`action-btn ${isLiked ? 'liked' : ''}`}
                     onClick={handleLike}
                 >
-                    <span className="action-icon">{isLiked ? '❤️' : '🤍'}</span>
+                    <span className="action-icon">{isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon />}</span>
                     <span>Like</span>
                 </button>
                 <button 
                     className="action-btn"
                     onClick={() => setShowComments(!showComments)}
                 >
-                    <span className="action-icon">💬</span>
+                    <span className="action-icon"><MessageIcon /></span>
                     <span>Comment</span>
                 </button>
                 <div className="share-btn-container" ref={shareMenuRef}>
@@ -921,7 +922,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                         className="action-btn" 
                         onClick={() => setShowShareMenu(!showShareMenu)}
                     >
-                        <span className="action-icon">↗️</span>
+                        <span className="action-icon"><IosShareIcon /></span>
                         <span>Share</span>
                     </button>
                     {showShareMenu && (
@@ -929,39 +930,39 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                             <div className="share-menu-section">
                                 <div className="share-menu-title">Share to</div>
                                 <button onClick={handleShareToTwitter} className="share-menu-item">
-                                    <span className="share-icon twitter">𝕏</span>
+                                    <span className="share-icon twitter"><XIcon fontSize="small" /></span>
                                     <span>Twitter</span>
                                 </button>
                                 <button onClick={handleShareToFacebook} className="share-menu-item">
-                                    <span className="share-icon facebook">f</span>
+                                    <span className="share-icon facebook"><FacebookIcon fontSize="small" /></span>
                                     <span>Facebook</span>
                                 </button>
                                 <button onClick={handleShareToLinkedIn} className="share-menu-item">
-                                    <span className="share-icon linkedin">in</span>
+                                    <span className="share-icon linkedin"><LinkedInIcon fontSize="small" /></span>
                                     <span>LinkedIn</span>
                                 </button>
                                 <button onClick={handleShareToWhatsApp} className="share-menu-item">
-                                    <span className="share-icon whatsapp">📱</span>
+                                    <span className="share-icon whatsapp"><WhatsAppIcon fontSize="small" /></span>
                                     <span>WhatsApp</span>
                                 </button>
                                 <button onClick={handleShareToInstagram} className="share-menu-item">
-                                    <span className="share-icon instagram">📷</span>
+                                    <span className="share-icon instagram"><InstagramIcon fontSize="small" /></span>
                                     <span>Instagram</span>
                                 </button>
                             </div>
                             <div className="share-menu-divider"></div>
                             <div className="share-menu-section">
                                 <button onClick={handleCopyLink} className="share-menu-item">
-                                    <span className="share-icon">📋</span>
+                                    <span className="share-icon"><ContentCopyIcon fontSize="small" /></span>
                                     <span>Copy Link</span>
                                 </button>
                                 <button onClick={handleShareToStory} className="share-menu-item">
-                                    <span className="share-icon">📸</span>
+                                    <span className="share-icon"><AddPhotoAlternateIcon fontSize="small" /></span>
                                     <span>Share to Story</span>
                                 </button>
                                 {navigator.share && (
                                     <button onClick={handleNativeShare} className="share-menu-item">
-                                        <span className="share-icon">↗️</span>
+                                        <span className="share-icon"><IosShareIcon fontSize="small" /></span>
                                         <span>More Options</span>
                                     </button>
                                 )}
@@ -973,7 +974,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     className={`action-btn ${isSaved ? 'saved' : ''}`}
                     onClick={handleSavePost}
                 >
-                    <span className="action-icon">{isSaved ? '🔖' : '📑'}</span>
+                    <span className="action-icon">{isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}</span>
                     <span>{isSaved ? 'Saved' : 'Save'}</span>
                 </button>
             </div>
@@ -1082,7 +1083,16 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     <div className="comment-input">
                         <div className="comment-avatar">
                             {currentUser?.profilePicture ? (
-                                <img src={currentUser.profilePicture} alt={currentUser.name} />
+                                <img 
+                                    src={currentUser.profilePicture.startsWith('http') 
+                                        ? currentUser.profilePicture 
+                                        : (currentUser.profilePicture.startsWith('/uploads')
+                                            ? `http://localhost:5000${currentUser.profilePicture}`
+                                            : currentUser.profilePicture
+                                        )
+                                    } 
+                                    alt={currentUser.name} 
+                                />
                             ) : (
                                 <div className="avatar-placeholder-small">
                                     {currentUser?.name?.charAt(0).toUpperCase()}

@@ -18,7 +18,7 @@ import {
   forwardMessage
 } from "../controllers/messageController.js";
 import { protect } from "../middleware/auth.js";
-import { upload, documentUpload, handleUploadError } from "../middleware/upload.js";
+import { upload, documentUpload, audioUpload, handleUploadError } from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -56,7 +56,7 @@ router.post("/message/:messageId/reaction", protect, addReaction);
 router.delete("/message/:messageId/reaction", protect, removeReaction);
 
 // Send voice message
-router.post("/:conversationId/send-voice", protect, upload.single('audio'), handleUploadError, sendVoiceMessage);
+router.post("/:conversationId/send-voice", protect, audioUpload.single('audio'), handleUploadError, sendVoiceMessage);
 
 // Send video message
 router.post("/:conversationId/send-video", protect, upload.single('video'), handleUploadError, sendVideoMessage);

@@ -200,7 +200,12 @@ export const removeReaction = async (messageId) => {
 
 export const sendVoiceMessage = async (conversationId, audioBlob) => {
   const formData = new FormData();
-  formData.append('audio', audioBlob, 'voice-message.webm');
+  // Use the blob's MIME type or default to webm
+  const mimeType = audioBlob.type || 'audio/webm';
+  const fileExtension = mimeType.includes('webm') ? 'webm' : 
+                        mimeType.includes('wav') ? 'wav' : 
+                        mimeType.includes('ogg') ? 'ogg' : 'webm';
+  formData.append('audio', audioBlob, `voice-message.${fileExtension}`);
   return await API.post(`/messages/${conversationId}/send-voice`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',

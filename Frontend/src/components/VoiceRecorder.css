@@ -1,165 +1,160 @@
 .voice-recorder {
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: white;
+  border-top: 1px solid #e0e7ff;
+  padding: 16px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  backdrop-filter: blur(4px);
 }
 
 .recorder-content {
-  background: #fff;
-  border-radius: 16px;
-  padding: 32px;
-  min-width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px;
+  gap: 12px;
 }
 
 .recording-indicator {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
-  color: #1da1f2;
+  color: #ef4444;
 }
 
 .red-dot {
   width: 12px;
   height: 12px;
-  background: #e74c3c;
+  background: #ef4444;
   border-radius: 50%;
-  animation: pulse 1.5s ease-in-out infinite;
+  animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
-    transform: scale(1);
   }
   50% {
     opacity: 0.5;
-    transform: scale(1.2);
   }
 }
 
 .recording-text {
-  color: #333;
+  color: #1f2937;
 }
 
 .recording-waveform {
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 60px;
+  height: 40px;
+  justify-content: center;
 }
 
 .wave-bar {
   width: 4px;
-  height: 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(to top, #6366f1, #a78bfa);
   border-radius: 2px;
-  animation: wave 1s ease-in-out infinite;
+  animation: wave 0.6s ease-in-out infinite;
 }
 
-.wave-bar:nth-child(1) { animation-delay: 0s; }
-.wave-bar:nth-child(2) { animation-delay: 0.1s; }
-.wave-bar:nth-child(3) { animation-delay: 0.2s; }
-.wave-bar:nth-child(4) { animation-delay: 0.3s; }
-.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+.wave-bar:nth-child(1) { animation-delay: 0s; height: 16px; }
+.wave-bar:nth-child(2) { animation-delay: 0.1s; height: 24px; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 32px; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; height: 24px; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; height: 20px; }
 
 @keyframes wave {
-  0%, 100% {
-    height: 20px;
-  }
-  50% {
-    height: 50px;
-  }
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.5); }
 }
 
 .recording-time {
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
-  font-family: 'Courier New', monospace;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #6366f1;
+  padding: 8px 0;
 }
 
 .preview-indicator {
-  color: #27ae60;
-  font-size: 18px;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.preview-message-indicator {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 16px;
   font-weight: 600;
+  color: #10b981;
+  background: #f0fdf4;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
 }
 
 .preview-text {
-  color: #333;
+  font-weight: 500;
 }
 
-.recorder-content audio {
+.voice-recorder audio {
   width: 100%;
-  margin: 10px 0;
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 8px 0;
 }
 
 .recorder-actions {
   display: flex;
   gap: 12px;
-  margin-top: 10px;
+  justify-content: center;
+  margin-top: 8px;
 }
 
 .recorder-btn {
-  padding: 12px 24px;
+  padding: 10px 24px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  min-width: 100px;
 }
 
 .cancel-btn {
-  background: #f1f3f5;
-  color: #333;
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
 }
 
 .cancel-btn:hover {
-  background: #e9ecef;
+  background: #e5e7eb;
+  color: #374151;
 }
 
 .stop-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ef4444;
   color: white;
 }
 
 .stop-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  background: #dc2626;
 }
 
 .send-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #6366f1;
   color: white;
 }
 
 .send-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-@media (max-width: 768px) {
-  .recorder-content {
-    min-width: 90%;
-    padding: 24px;
-  }
-
-  .recording-time {
-    font-size: 28px;
-  }
+  background: #4f46e5;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }

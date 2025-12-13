@@ -25,7 +25,7 @@ export const getConversations = async (req, res) => {
     const conversations = await Conversation.find({
       participants: userId
     })
-      .populate('participants', 'name email profilePicture isOnline lastSeen activityStatus')
+      .populate('participants', '_id name email profilePicture isOnline lastSeen activityStatus')
       .sort({ lastMessageTime: -1 });
 
     // Format conversations with the other participant's info and unread count
@@ -180,14 +180,21 @@ export const sendMessage = async (req, res) => {
 
     // Emit socket event to receiver
     const io = req.app.get('io');
+    const onlineUsers = req.app.get('onlineUsers');
     const receiverId = conversation.participants.find(p => p.toString() !== userId);
-    if (io && receiverId) {
-      const onlineUsers = req.app.get('onlineUsers');
+    
+    if (io && onlineUsers && receiverId) {
       const receiverSocketId = onlineUsers.get(receiverId.toString());
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receiveMessage', {
           conversationId,
           message: messageForSocket
+        });
+        // Also emit conversation update for sidebar
+        io.to(receiverSocketId).emit('conversationUpdated', {
+          conversationId,
+          lastMessage: messagePreview,
+          lastMessageTime: conversation.lastMessageTime
         });
       }
     }
@@ -335,14 +342,20 @@ export const sendImageMessage = async (req, res) => {
 
     // Emit socket event to receiver
     const io = req.app.get('io');
+    const onlineUsers = req.app.get('onlineUsers');
     const receiverId = conversation.participants.find(p => p.toString() !== userId);
-    if (io && receiverId) {
-      const onlineUsers = req.app.get('onlineUsers');
+    
+    if (io && onlineUsers && receiverId) {
       const receiverSocketId = onlineUsers.get(receiverId.toString());
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receiveMessage', {
           conversationId,
           message
+        });
+        io.to(receiverSocketId).emit('conversationUpdated', {
+          conversationId,
+          lastMessage: conversation.lastMessage,
+          lastMessageTime: conversation.lastMessageTime
         });
       }
     }
@@ -576,10 +589,14 @@ export const sendVoiceMessage = async (req, res) => {
       return res.status(400).json({ message: "No audio file uploaded" });
     }
 
+    // Store file size for duration estimation
+    const fileSize = req.file ? req.file.size : 0;
+
     const message = await Message.create({
       conversationId,
       sender: userId,
       audio: audioPath,
+      fileSize: fileSize,
       messageType: 'audio'
     });
 
@@ -589,16 +606,23 @@ export const sendVoiceMessage = async (req, res) => {
 
     await message.populate('sender', 'name email profilePicture');
 
-    // Emit socket event
+    // Emit socket event to receiver
     const io = req.app.get('io');
+    const onlineUsers = req.app.get('onlineUsers');
     const receiverId = conversation.participants.find(p => p.toString() !== userId);
-    if (io && receiverId) {
-      const onlineUsers = req.app.get('onlineUsers');
+    
+    if (io && onlineUsers && receiverId) {
       const receiverSocketId = onlineUsers.get(receiverId.toString());
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receiveMessage', {
           conversationId,
           message
+        });
+        // Also emit conversation update
+        io.to(receiverSocketId).emit('conversationUpdated', {
+          conversationId,
+          lastMessage: '🎤 Voice message',
+          lastMessageTime: conversation.lastMessageTime
         });
       }
     }
@@ -640,16 +664,22 @@ export const sendVideoMessage = async (req, res) => {
 
     await message.populate('sender', 'name email profilePicture');
 
-    // Emit socket event
+    // Emit socket event to receiver
     const io = req.app.get('io');
+    const onlineUsers = req.app.get('onlineUsers');
     const receiverId = conversation.participants.find(p => p.toString() !== userId);
-    if (io && receiverId) {
-      const onlineUsers = req.app.get('onlineUsers');
+    
+    if (io && onlineUsers && receiverId) {
       const receiverSocketId = onlineUsers.get(receiverId.toString());
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receiveMessage', {
           conversationId,
           message
+        });
+        io.to(receiverSocketId).emit('conversationUpdated', {
+          conversationId,
+          lastMessage: conversation.lastMessage,
+          lastMessageTime: conversation.lastMessageTime
         });
       }
     }
@@ -697,16 +727,22 @@ export const sendDocument = async (req, res) => {
 
     await message.populate('sender', 'name email profilePicture');
 
-    // Emit socket event
+    // Emit socket event to receiver
     const io = req.app.get('io');
+    const onlineUsers = req.app.get('onlineUsers');
     const receiverId = conversation.participants.find(p => p.toString() !== userId);
-    if (io && receiverId) {
-      const onlineUsers = req.app.get('onlineUsers');
+    
+    if (io && onlineUsers && receiverId) {
       const receiverSocketId = onlineUsers.get(receiverId.toString());
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receiveMessage', {
           conversationId,
           message
+        });
+        io.to(receiverSocketId).emit('conversationUpdated', {
+          conversationId,
+          lastMessage: conversation.lastMessage,
+          lastMessageTime: conversation.lastMessageTime
         });
       }
     }
@@ -754,16 +790,22 @@ export const forwardMessage = async (req, res) => {
       await newMessage.populate('sender', 'name email profilePicture');
       forwardedMessages.push(newMessage);
 
-      // Emit socket event
+      // Emit socket event to receiver
       const io = req.app.get('io');
+      const onlineUsers = req.app.get('onlineUsers');
       const receiverId = conversation.participants.find(p => p.toString() !== userId);
-      if (io && receiverId) {
-        const onlineUsers = req.app.get('onlineUsers');
+      
+      if (io && onlineUsers && receiverId) {
         const receiverSocketId = onlineUsers.get(receiverId.toString());
         if (receiverSocketId) {
           io.to(receiverSocketId).emit('receiveMessage', {
             conversationId,
             message: newMessage
+          });
+          io.to(receiverSocketId).emit('conversationUpdated', {
+            conversationId,
+            lastMessage: conversation.lastMessage,
+            lastMessageTime: conversation.lastMessageTime
           });
         }
       }

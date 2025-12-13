@@ -296,6 +296,27 @@ export const addReaction = async (req, res) => {
 
     await story.populate('reactions.user', 'name profilePicture');
 
+    // Send real-time notification to story owner
+    const io = global.io;
+    const userSocketMap = global.userSocketMap;
+    const reactionUser = await User.findById(userId);
+    
+    if (io && userSocketMap && story.user.toString() !== userId) {
+      const storyOwnerId = story.user.toString();
+      const storyOwnerSocketId = userSocketMap.get(storyOwnerId);
+      
+      if (storyOwnerSocketId) {
+        io.to(storyOwnerSocketId).emit('storyLike', {
+          storyId: storyId,
+          userId: userId,
+          userName: reactionUser.name,
+          userProfilePicture: reactionUser.profilePicture,
+          emoji: emoji,
+          message: `${reactionUser.name} reacted with ${emoji} to your story`
+        });
+      }
+    }
+
     res.json(story);
   } catch (error) {
     console.error('Error adding reaction:', error);
@@ -324,24 +345,90 @@ export const replyToStory = async (req, res) => {
       return res.status(410).json({ message: 'Story has expired' });
     }
 
-    // Add reply
+    // Add reply to story
     story.replies.push({ user: userId, text });
     await story.save();
 
     await story.populate('replies.user', 'name profilePicture');
 
-    // Get story owner to send notification
+    // Get story owner and reply user details
     const storyOwner = story.user;
-    
-    // Send notification to story owner
     const Notification = (await import('../models/Notification.js')).default;
+    const Conversation = (await import('../models/Conversation.js')).default;
+    const Message = (await import('../models/Message.js')).default;
     const replyUser = await User.findById(userId);
+
+    // Create or get conversation between reply user and story owner
+    let conversation = await Conversation.findOne({
+      $or: [
+        { participants: { $all: [userId, storyOwner] } },
+        { participants: { $all: [storyOwner, userId] } }
+      ]
+    });
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [userId, storyOwner]
+      });
+    }
+
+    // Create message in conversation for the reply
+    const message = await Message.create({
+      sender: userId,
+      text: text,
+      conversationId: conversation._id,
+      messageType: 'text',
+      isStoryReply: true,
+      storyId: storyId
+    });
+
+    // Update conversation with latest message
+    conversation.lastMessage = message._id;
+    conversation.lastMessageTime = new Date();
+    await conversation.save();
+
+    // Send notification to story owner
     await Notification.create({
       recipient: storyOwner,
       sender: userId,
-      type: 'comment',
-      message: `${replyUser.name} replied to your story`
+      type: 'story_reply',
+      message: `${replyUser.name} replied to your story: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`
     });
+
+    // Send real-time socket notification
+    const io = global.io;
+    const userSocketMap = global.userSocketMap;
+    
+    if (io && userSocketMap && storyOwner.toString() !== userId) {
+      const storyOwnerId = storyOwner.toString();
+      const storyOwnerSocketId = userSocketMap.get(storyOwnerId);
+      
+      if (storyOwnerSocketId) {
+        io.to(storyOwnerSocketId).emit('storyReply', {
+          storyId: storyId,
+          userId: userId,
+          userName: replyUser.name,
+          userProfilePicture: replyUser.profilePicture,
+          replyText: text,
+          conversationId: conversation._id,
+          message: `${replyUser.name} replied to your story in your chat`
+        });
+        
+        // Also emit new message event for chat
+        io.to(storyOwnerSocketId).emit('newMessage', {
+          conversationId: conversation._id,
+          message: {
+            _id: message._id,
+            sender: { _id: userId, name: replyUser.name, profilePicture: replyUser.profilePicture },
+            text: text,
+            messageType: 'text',
+            isStoryReply: true,
+            storyId: storyId,
+            createdAt: message.createdAt
+          }
+        });
+      }
+    }
 
     res.json(story);
   } catch (error) {
@@ -424,12 +511,13 @@ export const answerQuestion = async (req, res) => {
     }
 
     // Check if user already answered
-    const hasAnswered = story.question.answers.some(a => a.user.toString() === userId);
+    const hasAnswered = story.question.answers.some(a => a.user.toString() === userId.toString());
+    
     if (hasAnswered) {
       return res.status(400).json({ message: 'You have already answered this question' });
     }
 
-    // Add answer
+    // Add answer to story
     story.question.answers.push({
       user: userId,
       text: answer.trim(),
@@ -439,15 +527,89 @@ export const answerQuestion = async (req, res) => {
 
     await story.populate('question.answers.user', 'name profilePicture');
 
-    // Send notification to story owner
+    // Get story owner and answer user details
+    const storyOwner = story.user;
     const Notification = (await import('../models/Notification.js')).default;
+    const Conversation = (await import('../models/Conversation.js')).default;
+    const Message = (await import('../models/Message.js')).default;
     const answerUser = await User.findById(userId);
+
+    // Create or get conversation between answer user and story owner
+    let conversation = await Conversation.findOne({
+      $or: [
+        { participants: { $all: [userId, storyOwner] } },
+        { participants: { $all: [storyOwner, userId] } }
+      ]
+    }).populate('participants', '_id name email profilePicture isOnline lastSeen activityStatus');
+
+    if (!conversation) {
+      conversation = await Conversation.create({
+        participants: [userId, storyOwner]
+      });
+      // Populate the newly created conversation
+      conversation = await Conversation.findById(conversation._id).populate('participants', '_id name email profilePicture isOnline lastSeen activityStatus');
+    }
+
+    // Create message in conversation for the answer (like a story reply)
+    const message = await Message.create({
+      sender: userId,
+      text: answer.trim(),
+      conversationId: conversation._id,
+      messageType: 'text',
+      isStoryReply: true,
+      storyId: storyId,
+      questionText: story.question.text
+    });
+
+    // Update conversation with latest message
+    conversation.lastMessage = message._id;
+    conversation.lastMessageTime = new Date();
+    await conversation.save();
+
+    // Send notification to story owner
     await Notification.create({
-      recipient: story.user,
+      recipient: storyOwner,
       sender: userId,
       type: 'story_answer',
-      message: `${answerUser.name} answered your question`
+      message: `${answerUser.name} answered your question: "${answer.substring(0, 50)}${answer.length > 50 ? '...' : ''}"`
     });
+
+    // Emit socket events to story owner
+    const io = global.io;
+    const userSocketMap = global.userSocketMap;
+    
+    if (io && userSocketMap && storyOwner.toString() !== userId) {
+      const storyOwnerId = storyOwner.toString();
+      const storyOwnerSocketId = userSocketMap.get(storyOwnerId);
+      
+      if (storyOwnerSocketId) {
+        // Emit story answer event
+        io.to(storyOwnerSocketId).emit('storyAnswer', {
+          storyId: storyId,
+          userId: userId,
+          userName: answerUser.name,
+          userProfilePicture: answerUser.profilePicture,
+          answerText: answer,
+          conversationId: conversation._id,
+          message: `${answerUser.name} answered your question in your chat`
+        });
+        
+        // Also emit new message event for chat so it appears in Messages tab
+        io.to(storyOwnerSocketId).emit('newMessage', {
+          conversationId: conversation._id,
+          message: {
+            _id: message._id,
+            sender: { _id: userId, name: answerUser.name, profilePicture: answerUser.profilePicture },
+            text: answer,
+            messageType: 'text',
+            isStoryReply: true,
+            storyId: storyId,
+            questionText: story.question.text,
+            createdAt: message.createdAt
+          }
+        });
+      }
+    }
 
     res.json(story);
   } catch (error) {
