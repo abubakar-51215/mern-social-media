@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useHistory } from 'react-router-dom';
 import { toast } from './Toast';
+import ReportModal from './ReportModal';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import MessageIcon from '@mui/icons-material/Message';
@@ -54,6 +55,7 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
     const [showLikesModal, setShowLikesModal] = useState(false);
     const [likesUsers, setLikesUsers] = useState([]);
     const [loadingLikes, setLoadingLikes] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
     const shareMenuRef = useRef(null);
     
     // Music player state
@@ -977,6 +979,16 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     <span className="action-icon">{isSaved ? <BookmarkIcon /> : <BookmarkBorderIcon />}</span>
                     <span>{isSaved ? 'Saved' : 'Save'}</span>
                 </button>
+                {!isOwner && (
+                    <button 
+                        className="action-btn report"
+                        onClick={() => setShowReportModal(true)}
+                        title="Report this post"
+                    >
+                        <span className="action-icon">🚩</span>
+                        <span>Report</span>
+                    </button>
+                )}
             </div>
 
             {showComments && (
@@ -1169,6 +1181,21 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                         </button>
                     </div>
                 </div>
+            )}
+
+            {/* Report Modal */}
+            {showReportModal && (
+                <ReportModal
+                    isOpen={showReportModal}
+                    reportType="post"
+                    itemId={post._id}
+                    itemName={`Post by ${post.user.name}`}
+                    onClose={() => setShowReportModal(false)}
+                    onSuccess={() => {
+                        toast.success('Report submitted successfully');
+                        setShowReportModal(false);
+                    }}
+                />
             )}
         </div>
     );

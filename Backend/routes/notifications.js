@@ -1,13 +1,35 @@
 import express from 'express';
 import Notification from '../models/Notification.js';
 import { protect } from '../middleware/auth.js';
+import { sendAdminNotification, sendBulkNotification, getNotifications, markAsRead, markAllAsRead, deleteNotification, getUnreadCount } from '../controllers/notificationController.js';
 
 const router = express.Router();
+
+// Admin: Send notification to single user
+router.post('/admin/send', protect, async (req, res) => {
+  // Check if user is admin
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ message: 'Only admins can send notifications' });
+  }
+  await sendAdminNotification(req, res);
+});
+
+// Admin: Send bulk notification to multiple users
+router.post('/admin/bulk', protect, async (req, res) => {
+  // Check if user is admin
+  if (!req.user.isAdmin) {
+    return res.status(403).json({ message: 'Only admins can send notifications' });
+  }
+  await sendBulkNotification(req, res);
+});
 
 // Get all notifications for the current user
 router.get('/', protect, async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.json([]);
+    }
     const notifications = await Notification.find({ recipient: userId })
       .populate('sender', 'name profilePicture')
       .sort({ createdAt: -1 })
@@ -24,6 +46,9 @@ router.get('/', protect, async (req, res) => {
 router.get('/unread/count', protect, async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id;
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.json({ count: 0 });
+    }
     const count = await Notification.countDocuments({ 
       recipient: userId, 
       read: false 

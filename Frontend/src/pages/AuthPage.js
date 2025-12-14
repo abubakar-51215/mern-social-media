@@ -63,9 +63,47 @@ const AuthPage = () => {
         try {
             let result;
             if (isLogin) {
-                result = await loginUser({ email: formData.email, password: formData.password });
-                setAuth(result.token, result.user);
-                history.push('/dashboard');
+                // Hardcoded Admin Credentials Check
+                const ADMIN_EMAIL = 'admin@pingup.com';
+                const ADMIN_PASSWORD = 'Admin@123';
+                
+                // Trim the input values
+                const enteredEmail = formData.email.trim().toLowerCase();
+                const enteredPassword = formData.password.trim();
+                
+                console.log('Login attempt:', { enteredEmail, passwordLength: enteredPassword.length });
+                console.log('Comparing with admin:', { ADMIN_EMAIL, ADMIN_PASSWORD });
+                console.log('Email match:', enteredEmail === ADMIN_EMAIL.toLowerCase());
+                console.log('Password match:', enteredPassword === ADMIN_PASSWORD);
+                
+                if (enteredEmail === ADMIN_EMAIL.toLowerCase() && enteredPassword === ADMIN_PASSWORD) {
+                    console.log('Admin login detected');
+                    // Admin login
+                    const adminUser = {
+                        _id: 'admin-001',
+                        name: 'Administrator',
+                        email: ADMIN_EMAIL,
+                        role: 'admin'
+                    };
+                    const adminToken = 'admin-token-' + Date.now();
+                    setAuth(adminToken, adminUser);
+                    console.log('Admin auth set, redirecting to /admin/dashboard');
+                    setTimeout(() => {
+                        history.push('/admin/dashboard');
+                    }, 100);
+                    return;
+                } else {
+                    // Regular user login
+                    result = await loginUser({ email: formData.email, password: formData.password });
+                    setAuth(result.token, result.user);
+                    
+                    // Check if user has admin role from backend
+                    if (result.user.role === 'admin') {
+                        history.push('/admin/dashboard');
+                    } else {
+                        history.push('/dashboard');
+                    }
+                }
             } else {
                 result = await registerUser(formData);
                 setSuccess('Account created successfully! Please login.');

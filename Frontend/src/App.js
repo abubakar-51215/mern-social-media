@@ -14,6 +14,13 @@ import CreateStory from "./pages/CreateStory";
 import Chat from "./pages/Chat";
 import HashtagPosts from "./pages/HashtagPosts";
 import Settings from "./pages/Settings";
+import AdminDashboard from "./pages/AdminDashboard";
+// eslint-disable-next-line no-unused-vars
+import AdminUsers from "./pages/AdminUsers";
+// eslint-disable-next-line no-unused-vars
+import AdminPosts from "./pages/AdminPosts";
+// eslint-disable-next-line no-unused-vars
+import AdminReports from "./pages/AdminReports";
 
 import Sidebar from "./components/Sidebar";
 import AIChatbot from "./components/AIChatbot";
@@ -63,6 +70,18 @@ function App() {
           {/* Auth Routes */}
           <Route path="/" exact component={AuthPage} />
           <Route path="/auth" component={AuthPage} />
+
+        {/* Admin Dashboard */}
+        <Route path="/admin/dashboard" component={AdminDashboard} />
+
+        {/* Admin Users */}
+        <Route path="/admin/users" component={AdminUsers} />
+
+        {/* Admin Posts */}
+        <Route path="/admin/posts" component={AdminPosts} />
+
+        {/* Admin Reports */}
+        <Route path="/admin/reports" component={AdminReports} />
 
         {/* Dashboard (full page layout itself) */}
         <Route path="/dashboard" component={Dashboard} />

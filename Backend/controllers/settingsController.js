@@ -6,6 +6,11 @@ import QRCode from 'qrcode';
 // Get user settings
 export const getSettings = async (req, res) => {
   try {
+    // Check if userId is a valid ObjectId
+    if (!req.user.id || typeof req.user.id !== 'string' || req.user.id.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot access user settings' });
+    }
+
     const user = await User.findById(req.user.id)
       .select('isPrivate showActivityStatus privacySettings notificationSettings twoFactorEnabled');
     

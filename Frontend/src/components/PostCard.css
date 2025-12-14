@@ -322,7 +322,7 @@
 .post-actions {
   display: flex;
   padding: 8px 4px;
-  gap: 4px;
+  gap: 8px;
 }
 
 .action-btn {
@@ -331,8 +331,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 8px;
-  background: none;
+  padding: 10px 12px;
+  background: #f0f2f5;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -343,12 +343,13 @@
 }
 
 .action-btn:hover {
-  background: #f3f4f6;
+  background: #e4e6eb;
   color: #374151;
 }
 
 .action-btn.liked {
-  color: #ef4444;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
 }
 
 .action-btn.liked .action-icon {

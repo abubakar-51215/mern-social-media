@@ -85,6 +85,11 @@ router.get('/status/:userId', protect, async (req, res) => {
 router.get('/pending', protect, async (req, res) => {
   try {
     const userId = req.user.id;
+
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot access pending requests' });
+    }
+
     const user = await (await import('../models/User.js')).default.findById(userId).populate('sentFriendRequests', 'name email profilePicture');
     
     if (!user) {

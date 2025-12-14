@@ -112,6 +112,10 @@ export const searchUsers = async (req, res) => {
 export const getSuggestedUsers = async (req, res) => {
   try {
     const currentUserId = req.user?.id || req.user?._id || req.user;
+
+    if (!currentUserId || typeof currentUserId !== 'string' || currentUserId.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot fetch suggested users' });
+    }
     
     const currentUser = await User.findById(currentUserId);
     

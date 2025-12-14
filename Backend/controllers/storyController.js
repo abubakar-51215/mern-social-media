@@ -157,6 +157,11 @@ export const getStories = async (req, res) => {
   try {
     const userId = req.user?.id || req.user?._id || req.user;
 
+    // Check if userId is a valid ObjectId
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot view stories' });
+    }
+
     // Get current user to access friends list and close friends
     const currentUser = await User.findById(userId);
     if (!currentUser) {

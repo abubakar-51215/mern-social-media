@@ -1,0 +1,265 @@
+/* Report Modal */
+.report-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.report-modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.report-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.report-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.report-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #6b7280;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.3s;
+}
+
+.report-modal-close:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.report-modal-body {
+  padding: 24px;
+}
+
+.report-item-info {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.report-item-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #92400e;
+}
+
+.report-item-info strong {
+  color: #78350f;
+}
+
+.report-form-group {
+  margin-bottom: 20px;
+}
+
+.report-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.report-form-group select,
+.report-form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #374151;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.report-form-group select:focus,
+.report-form-group textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.report-form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.report-modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+.report-btn-cancel,
+.report-btn-submit {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.report-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.report-btn-cancel:hover {
+  background: #e5e7eb;
+}
+
+.report-btn-submit {
+  background: #dc2626;
+  color: white;
+}
+
+.report-btn-submit:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.report-btn-submit:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+.dark-mode .report-modal-content {
+  background: #1f2937;
+}
+
+.dark-mode .report-modal-header {
+  border-bottom-color: #374151;
+}
+
+.dark-mode .report-modal-header h3 {
+  color: #f9fafb;
+}
+
+.dark-mode .report-modal-close {
+  color: #9ca3af;
+}
+
+.dark-mode .report-modal-close:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.dark-mode .report-item-info {
+  background: #422006;
+  border-color: #92400e;
+}
+
+.dark-mode .report-item-info p {
+  color: #fbbf24;
+}
+
+.dark-mode .report-item-info strong {
+  color: #fcd34d;
+}
+
+.dark-mode .report-form-group label {
+  color: #e5e7eb;
+}
+
+.dark-mode .report-form-group select,
+.dark-mode .report-form-group textarea {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f9fafb;
+}
+
+.dark-mode .report-form-group select:focus,
+.dark-mode .report-form-group textarea:focus {
+  border-color: #6366f1;
+}
+
+.dark-mode .report-modal-footer {
+  border-top-color: #374151;
+}
+
+.dark-mode .report-btn-cancel {
+  background: #374151;
+  color: #e5e7eb;
+}
+
+.dark-mode .report-btn-cancel:hover {
+  background: #4b5563;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .report-modal-content {
+    width: 95%;
+    margin: 10px;
+  }
+
+  .report-modal-header,
+  .report-modal-body {
+    padding: 16px;
+  }
+
+  .report-modal-footer {
+    flex-direction: column;
+  }
+
+  .report-btn-cancel,
+  .report-btn-submit {
+    width: 100%;
+  }
+}

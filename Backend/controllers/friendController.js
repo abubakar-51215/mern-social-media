@@ -200,6 +200,12 @@ export const rejectFriendRequest = async (req, res) => {
 export const getFriendRequests = async (req, res) => {
   try {
     const userId = req.user.id;
+    
+    // Check if userId is a valid ObjectId
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot access friend requests' });
+    }
+    
     const user = await User.findById(userId).populate('friendRequests', 'name email profilePicture');
     
     if (!user) {
@@ -217,6 +223,12 @@ export const getFriendRequests = async (req, res) => {
 export const getFriends = async (req, res) => {
   try {
     const userId = req.user.id;
+
+    // Block invalid ObjectId (e.g., admin token)
+    if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+      return res.status(403).json({ message: 'Admin users cannot access friends list' });
+    }
+
     const user = await User.findById(userId).populate('friends', 'name email profilePicture bio');
     
     if (!user) {

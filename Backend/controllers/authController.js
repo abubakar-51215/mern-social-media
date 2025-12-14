@@ -79,9 +79,10 @@ export const loginUser = async (req, res) => {
       user.loginSessions = user.loginSessions.slice(0, 10);
     }
     
-    // Update online status
+    // Update online status and last login
     user.isOnline = true;
     user.lastSeen = new Date();
+    user.lastLogin = new Date();
     
     await user.save();
 

@@ -20,6 +20,8 @@ import storyRoutes from './routes/stories.js';
 import groupRoutes from './routes/groups.js';
 import blockRoutes from './routes/block.js';
 import settingsRoutes from './routes/settings.js';
+import adminRoutes from './routes/admin.js';
+import reportRoutes from './routes/reports.js';
 
 // Import config
 import './config/passport.js';
@@ -146,6 +148,8 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/users', blockRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Socket.io connection handling
 const userSocketMap = new Map();
@@ -159,6 +163,11 @@ io.on('connection', (socket) => {
     
     // Update user online status
     try {
+            // Skip if not a valid ObjectId (e.g., admin-001)
+            if (!userId || typeof userId !== 'string' || userId.length !== 24) {
+              return;
+            }
+      
       const User = (await import('./models/User.js')).default;
       await User.findByIdAndUpdate(userId, {
         isOnline: true,
@@ -343,6 +352,12 @@ io.on('connection', (socket) => {
   socket.on('disconnect', async () => {
     if (socket.userId) {
       // Update user offline status
+              // Skip if not a valid ObjectId (e.g., admin-001)
+              if (typeof socket.userId !== 'string' || socket.userId.length !== 24) {
+                userSocketMap.delete(socket.userId);
+                return;
+              }
+        
       try {
         const User = (await import('./models/User.js')).default;
         await User.findByIdAndUpdate(socket.userId, {

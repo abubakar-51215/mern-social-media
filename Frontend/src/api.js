@@ -560,4 +560,110 @@ export const deleteAccount = async (password, confirmation) => {
   return response.data;
 };
 
+// Admin API functions
+export const getAdminStats = async () => {
+  return await API.get('/admin/stats');
+};
+
+export const getAllUsers = async (page = 1, limit = 10, search = '') => {
+  return await API.get(`/admin/users?page=${page}&limit=${limit}&search=${search}`);
+};
+
+export const getUserDetails = async (userId) => {
+  return await API.get(`/admin/users/${userId}`);
+};
+
+export const deleteUser = async (userId) => {
+  return await API.delete(`/admin/users/${userId}`);
+};
+
+export const toggleBlockUser = async (userId, blocked) => {
+  return await API.patch(`/admin/users/${userId}/block`, { blocked });
+};
+
+export const toggleShadowBan = async (userId, shadowBanned) => {
+  return await API.patch(`/admin/users/${userId}/shadow-ban`, { shadowBanned });
+};
+
+export const warnUser = async (userId, message) => {
+  return await API.post(`/admin/users/${userId}/warn`, { message });
+};
+
+// Admin Post Management
+export const getAdminPosts = async (page = 1, limit = 10, filters = {}) => {
+  const { userId, hashtag, startDate, endDate, reported } = filters;
+  let url = `/admin/posts?page=${page}&limit=${limit}`;
+  if (userId) url += `&userId=${userId}`;
+  if (hashtag) url += `&hashtag=${hashtag}`;
+  if (startDate) url += `&startDate=${startDate}`;
+  if (endDate) url += `&endDate=${endDate}`;
+  if (reported) url += `&reported=true`;
+  return await API.get(url);
+};
+
+export const getPostAnalytics = async (postId) => {
+  return await API.get(`/admin/posts/${postId}/analytics`);
+};
+
+export const deleteAdminPost = async (postId) => {
+  return await API.delete(`/admin/posts/${postId}`);
+};
+
+export const markPostInappropriate = async (postId, inappropriate) => {
+  return await API.patch(`/admin/posts/${postId}/inappropriate`, { inappropriate });
+};
+
+export const togglePostComments = async (postId) => {
+  return await API.patch(`/admin/posts/${postId}/comments`);
+};
+
+// Report & Moderation API functions
+export const createReport = async (reportData) => {
+  return await API.post('/reports', reportData);
+};
+
+export const getAllReports = async (filters = {}) => {
+  const { status, reportType, priority, page = 1, limit = 20 } = filters;
+  let url = `/reports?page=${page}&limit=${limit}`;
+  if (status) url += `&status=${status}`;
+  if (reportType) url += `&reportType=${reportType}`;
+  if (priority) url += `&priority=${priority}`;
+  return await API.get(url);
+};
+
+export const getReportById = async (reportId) => {
+  return await API.get(`/reports/${reportId}`);
+};
+
+export const updateReportStatus = async (reportId, status, resolution = '') => {
+  return await API.patch(`/reports/${reportId}/status`, { status, resolution });
+};
+
+export const takeModerationAction = async (actionData) => {
+  return await API.post('/reports/moderate', actionData);
+};
+
+export const getModerationHistory = async (filters = {}) => {
+  const { actionType, targetType, page = 1, limit = 20 } = filters;
+  let url = `/reports/history?page=${page}&limit=${limit}`;
+  if (actionType) url += `&actionType=${actionType}`;
+  if (targetType) url += `&targetType=${targetType}`;
+  return await API.get(url);
+};
+
+export const getReportStats = async () => {
+  return await API.get('/reports/stats');
+};
+
+// Admin Notification API functions
+export const sendAdminNotification = async (notificationData) => {
+  return await API.post('/notifications/admin/send', notificationData);
+};
+
+export const sendBulkNotification = async (bulkData) => {
+  return await API.post('/notifications/admin/bulk', bulkData);
+};
+
+// Admin Notifications (already exported above - use sendAdminNotification and sendBulkNotification)
+
 export default API;

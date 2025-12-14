@@ -264,6 +264,18 @@ const UserSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     }
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false
+  },
+  isShadowBanned: {
+    type: Boolean,
+    default: false
   }
 }, {
   timestamps: true

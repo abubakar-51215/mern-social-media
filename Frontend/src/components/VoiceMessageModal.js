@@ -11,6 +11,9 @@ const VoiceMessageModal = ({ audioBlob, recordingTime, onSend, onCancel }) => {
   useEffect(() => {
     if (!audioBlob) return;
 
+    // Capture the ref targets at effect run to avoid stale ref warnings
+    const audioElement = audioRef.current;
+
     try {
       // Only create URL once and store in ref
       if (!blobUrlRef.current) {
@@ -19,23 +22,21 @@ const VoiceMessageModal = ({ audioBlob, recordingTime, onSend, onCancel }) => {
         console.log(`📁 Audio blob URL created: ${url}, Size: ${audioBlob.size} bytes`);
       }
       
-      if (audioRef.current && blobUrlRef.current) {
+      if (audioElement && blobUrlRef.current) {
         // Set the blob URL to ALL source elements for compatibility
-        const sourceElements = audioRef.current.querySelectorAll('source');
+        const sourceElements = audioElement.querySelectorAll('source');
         sourceElements.forEach(source => {
           source.src = blobUrlRef.current;
         });
         
-        audioRef.current.load();
+        audioElement.load();
         console.log(`✅ Audio loaded into ${sourceElements.length} source elements`);
       }
     } catch (error) {
       console.error('❌ Error creating object URL:', error);
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     return () => {
-      const audioElement = audioRef.current;
       const blobUrl = blobUrlRef.current;
       
       if (audioElement) {

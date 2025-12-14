@@ -9,11 +9,12 @@ const NotificationSchema = new mongoose.Schema({
   sender: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false,
+    default: null
   },
   type: {
     type: String,
-    enum: ['like', 'comment', 'follow', 'story_like', 'story_reply', 'story_answer', 'friend_request', 'friend_accept', 'message', 'mention'],
+    enum: ['like', 'comment', 'follow', 'story_like', 'story_reply', 'story_answer', 'friend_request', 'friend_accept', 'message', 'mention', 'admin_warning', 'admin_notice', 'admin_guidelines', 'admin_suspension', 'admin_custom', 'moderation_action'],
     required: true
   },
   post: {
