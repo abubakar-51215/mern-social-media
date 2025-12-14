@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { loginUser, registerUser } from '../api';
+import { loginUser, registerUser, getPublicPlatformSettings } from '../api';
 import { setAuth } from '../utils/auth';
 import './AuthPage.css';
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const [platformInfo, setPlatformInfo] = useState({
+        platformName: 'MERN Social Media',
+        platformDescription: 'Connect, Share, and Build Relationships'
+    });
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -25,6 +29,24 @@ const AuthPage = () => {
     const history = useHistory();
 
     useEffect(() => {
+        // Fetch platform settings
+        const fetchPlatformInfo = async () => {
+            try {
+                const response = await getPublicPlatformSettings();
+                if (response.data) {
+                    setPlatformInfo({
+                        platformName: response.data.platformName || 'MERN Social Media',
+                        platformDescription: response.data.platformDescription || 'Connect, Share, and Build Relationships'
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching platform info:', error);
+                // Use default values if fetch fails
+            }
+        };
+
+        fetchPlatformInfo();
+
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const user = urlParams.get('user');
@@ -163,8 +185,8 @@ const AuthPage = () => {
                 <div className="auth-right">
                     <div className="auth-form-container">
                         <div className="auth-header">
-                            <h2>{isLogin ? 'Sign in to PingUp' : 'Create your account'}</h2>
-                            <p>{isLogin ? 'Welcome back! Please sign in to continue' : 'Welcome! Please fill in the details to get started.'}</p>
+                            <h2>{isLogin ? `Sign in to ${platformInfo.platformName}` : 'Create your account'}</h2>
+                            <p>{isLogin ? 'Welcome back! Please sign in to continue' : platformInfo.platformDescription}</p>
                         </div>
 
                         <button className="google-btn" onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'}>

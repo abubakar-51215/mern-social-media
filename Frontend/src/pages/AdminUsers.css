@@ -266,7 +266,6 @@
   border-radius: 14px;
   padding: 32px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-  max-height: calc(100vh - 128px);
   overflow-y: auto;
   border: 1px solid #e5e7eb;
 }

@@ -664,6 +664,71 @@ export const sendBulkNotification = async (bulkData) => {
   return await API.post('/notifications/admin/bulk', bulkData);
 };
 
-// Admin Notifications (already exported above - use sendAdminNotification and sendBulkNotification)
+// Analytics APIs
+export const getPlatformStats = async () => {
+  return await API.get('/analytics/platform/stats');
+};
+
+export const getNewUsersPerDay = async () => {
+  return await API.get('/analytics/users/new-per-day');
+};
+
+export const getNewPostsPerDay = async () => {
+  return await API.get('/analytics/posts/new-per-day');
+};
+
+export const getRetentionRate = async () => {
+  return await API.get('/analytics/retention-rate');
+};
+
+export const getMostActiveUsers = async (limit = 10) => {
+  return await API.get(`/analytics/users/most-active?limit=${limit}`);
+};
+
+export const getMostLikedPosts = async (limit = 10) => {
+  return await API.get(`/analytics/posts/most-liked?limit=${limit}`);
+};
+
+export const getMostReportedPosts = async (limit = 10) => {
+  return await API.get(`/analytics/posts/most-reported?limit=${limit}`);
+};
+
+// Admin Settings API
+export const getAdminSettings = async () => {
+  return await API.get('/admin-settings');
+};
+
+export const getPublicPlatformSettings = async () => {
+  return await API.get('/admin-settings/public');
+};
+
+export const updateAdminSettings = async (settings) => {
+  return await API.put('/admin-settings', settings);
+};
+
+export const resetAdminSettings = async () => {
+  return await API.post('/admin-settings/reset');
+};
+
+// Backup API
+export const exportDatabase = async () => {
+  return await API.get('/backup/export', { responseType: 'blob' });
+};
+
+export const createBackup = async () => {
+  return await API.post('/backup/create');
+};
+
+export const listBackups = async () => {
+  return await API.get('/backup/list');
+};
+
+export const restoreBackup = async (backupName) => {
+  return await API.post('/backup/restore', { backupName });
+};
+
+export const deleteBackup = async (backupName) => {
+  return await API.delete('/backup/delete', { data: { backupName } });
+};
 
 export default API;

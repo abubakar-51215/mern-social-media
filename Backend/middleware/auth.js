@@ -24,5 +24,13 @@ export const protect = (req, res, next) => {
   }
 };
 
+// Middleware to check if user is admin
+export const isAdmin = (req, res, next) => {
+  if (!req.user || (req.user.role !== 'admin' && !req.user.isAdmin)) {
+    return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+  }
+  next();
+};
+
 // Keep default export for backward compatibility
 export default protect;

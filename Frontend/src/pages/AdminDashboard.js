@@ -105,11 +105,11 @@ const AdminDashboard = () => {
             <span className="nav-icon">⚠️</span>
             <span>Reports</span>
           </a>
-          <a href="#analytics" className="nav-item">
+          <a href="/admin/analytics" className="nav-item">
             <span className="nav-icon">📈</span>
             <span>Analytics</span>
           </a>
-          <a href="#settings" className="nav-item">
+          <a href="/admin/settings" className="nav-item">
             <span className="nav-icon">⚙️</span>
             <span>Settings</span>
           </a>

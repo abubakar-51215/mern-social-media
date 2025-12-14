@@ -21,6 +21,10 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminPosts from "./pages/AdminPosts";
 // eslint-disable-next-line no-unused-vars
 import AdminReports from "./pages/AdminReports";
+// eslint-disable-next-line no-unused-vars
+import Analytics from "./pages/Analytics";
+// eslint-disable-next-line no-unused-vars
+import AdminSettings from "./pages/AdminSettings";
 
 import Sidebar from "./components/Sidebar";
 import AIChatbot from "./components/AIChatbot";
@@ -82,6 +86,12 @@ function App() {
 
         {/* Admin Reports */}
         <Route path="/admin/reports" component={AdminReports} />
+
+        {/* Admin Analytics */}
+        <Route path="/admin/analytics" component={Analytics} />
+
+        {/* Admin Settings */}
+        <Route path="/admin/settings" component={AdminSettings} />
 
         {/* Dashboard (full page layout itself) */}
         <Route path="/dashboard" component={Dashboard} />

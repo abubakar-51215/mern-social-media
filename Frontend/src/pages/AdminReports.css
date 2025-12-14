@@ -266,7 +266,6 @@
 }
 
 .user-info {
-  display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px;

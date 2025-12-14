@@ -22,11 +22,15 @@ import blockRoutes from './routes/block.js';
 import settingsRoutes from './routes/settings.js';
 import adminRoutes from './routes/admin.js';
 import reportRoutes from './routes/reports.js';
+import analyticsRoutes from './routes/analytics.js';
+import adminSettingsRoutes from './routes/adminSettings.js';
+import backupRoutes from './routes/backup.js';
 
 // Import config
 import './config/passport.js';
 import connectDB from './config/db.js';
 import { setSocketInstances } from './controllers/friendController.js';
+import { checkMaintenance } from './middleware/maintenance.js';
 
 dotenv.config();
 
@@ -139,17 +143,24 @@ connectDB();
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/friends', friendRoutes);
-app.use('/api/posts', postRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/stories', storyRoutes);
-app.use('/api/groups', groupRoutes);
-app.use('/api/users', blockRoutes);
-app.use('/api/settings', settingsRoutes);
+
+// Apply maintenance mode check to all user routes (except auth and admin)
+app.use('/api/users', checkMaintenance, userRoutes);
+app.use('/api/messages', checkMaintenance, messageRoutes);
+app.use('/api/friends', checkMaintenance, friendRoutes);
+app.use('/api/posts', checkMaintenance, postRoutes);
+app.use('/api/notifications', checkMaintenance, notificationRoutes);
+app.use('/api/stories', checkMaintenance, storyRoutes);
+app.use('/api/groups', checkMaintenance, groupRoutes);
+app.use('/api/users', checkMaintenance, blockRoutes);
+app.use('/api/settings', checkMaintenance, settingsRoutes);
+
+// Admin routes (not affected by maintenance mode)
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin-settings', adminSettingsRoutes);
+app.use('/api/backup', backupRoutes);
 
 // Socket.io connection handling
 const userSocketMap = new Map();

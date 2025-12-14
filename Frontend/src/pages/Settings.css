@@ -123,6 +123,14 @@
   border-bottom: none;
 }
 
+.setting-item.simple-item {
+  padding: 20px 0;
+}
+
+.setting-item.simple-item .setting-label {
+  font-size: 16px;
+}
+
 .setting-info {
   display: flex;
   flex-direction: column;
@@ -143,9 +151,10 @@
 /* Toggle Switch */
 .toggle-switch {
   position: relative;
-  width: 52px;
+  width: 48px;
   height: 28px;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -160,30 +169,30 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: #d1d5db;
-  border-radius: 28px;
+  background: #e0e0e0;
+  border-radius: 14px;
   transition: all 0.3s;
 }
 
 .toggle-slider::before {
   content: '';
   position: absolute;
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
+  height: 24px;
+  width: 24px;
+  left: 2px;
+  bottom: 2px;
   background: white;
   border-radius: 50%;
-  transition: all 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background: #6366f1;
+  background: #667eea;
 }
 
 .toggle-switch input:checked + .toggle-slider::before {
-  transform: translateX(24px);
+  transform: translateX(20px);
 }
 
 /* Select Dropdown */

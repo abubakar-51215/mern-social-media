@@ -564,10 +564,8 @@ const Settings = () => {
                 <div className="setting-group">
                   <h4>Notify me about...</h4>
                   
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <span className="setting-label">Messages</span>
-                    </div>
+                  <div className="setting-item simple-item">
+                    <span className="setting-label">Messages</span>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
@@ -578,10 +576,8 @@ const Settings = () => {
                     </label>
                   </div>
                   
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <span className="setting-label">Likes</span>
-                    </div>
+                  <div className="setting-item simple-item">
+                    <span className="setting-label">Likes</span>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
@@ -592,10 +588,8 @@ const Settings = () => {
                     </label>
                   </div>
                   
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <span className="setting-label">Comments</span>
-                    </div>
+                  <div className="setting-item simple-item">
+                    <span className="setting-label">Comments</span>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
@@ -606,10 +600,8 @@ const Settings = () => {
                     </label>
                   </div>
                   
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <span className="setting-label">New Followers</span>
-                    </div>
+                  <div className="setting-item simple-item">
+                    <span className="setting-label">New Followers</span>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
@@ -620,10 +612,8 @@ const Settings = () => {
                     </label>
                   </div>
                   
-                  <div className="setting-item">
-                    <div className="setting-info">
-                      <span className="setting-label">Friend Requests</span>
-                    </div>
+                  <div className="setting-item simple-item">
+                    <span className="setting-label">Friend Requests</span>
                     <label className="toggle-switch">
                       <input
                         type="checkbox"
