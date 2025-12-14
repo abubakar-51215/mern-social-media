@@ -1,9 +1,10 @@
 # MERN Social Media Application
 
-A full-stack social media platform built with MongoDB, Express.js, React, and Node.js.
+A full-stack social media platform built with MongoDB, Express.js, React, and Node.js with comprehensive admin panel and analytics.
 
 ## Features
 
+### User Features
 - 🔐 User Authentication (Email/Password & Google OAuth)
 - 👤 User Profiles with customization
 - 📝 Create, Edit, Delete Posts
@@ -18,6 +19,46 @@ A full-stack social media platform built with MongoDB, Express.js, React, and No
 - 🌐 Activity Status & Online Indicators
 - 🔐 Two-Factor Authentication
 - ⚙️ Account Settings & Privacy Controls
+- 🎵 Music Integration (Spotify)
+- 📱 QR Code Profile Sharing
+
+### Admin Features
+- 📊 **Analytics Dashboard**
+  - Platform statistics (users, posts, messages, stories)
+  - User growth analytics with charts
+  - Post engagement metrics
+  - Real-time active users monitoring
+  - Storage usage tracking
+  - Most reported content analysis
+  
+- 👥 **User Management**
+  - View all users with pagination
+  - User activity monitoring
+  - Ban/unban users
+  - Filter by role and status
+  - User statistics overview
+
+- 🚨 **Content Moderation**
+  - Report management system
+  - Review reported posts
+  - Approve/reject/delete reports
+  - Filter by status and severity
+  - Bulk actions support
+
+- ⚙️ **Platform Settings**
+  - General settings (platform name, description)
+  - Security configuration (2FA, password policies, rate limiting)
+  - Moderation settings (auto-moderation, content filters)
+  - Email notifications setup
+  - Feature toggles (stories, groups, messaging, reports)
+  - Maintenance mode with admin bypass
+  - Data & backup management
+
+- 💾 **Backup & Restore**
+  - Database export to JSON
+  - Automated backup creation
+  - Backup restoration
+  - Backup history management
 
 ## Tech Stack
 
@@ -107,25 +148,113 @@ The frontend will run on `http://localhost:3000`
 ```
 mern/
 ├── Backend/
-│   ├── config/          # Configuration files (DB, email, passport)
-│   ├── controllers/     # Route controllers
-│   ├── middleware/      # Custom middleware (auth, upload)
-│   ├── models/          # Mongoose models
-│   ├── routes/          # API routes
-│   ├── uploads/         # User uploaded files (not in git)
-│   ├── utils/           # Utility functions
-│   ├── index.js         # Server entry point
+│   ├── backups/                    # Database backups (JSON format)
+│   ├── config/
+│   │   ├── db.js                   # MongoDB connection
+│   │   ├── email.js                # Email configuration
+│   │   └── passport.js             # OAuth strategies
+│   ├── controllers/
+│   │   ├── adminController.js      # Admin user management
+│   │   ├── adminSettingsController.js  # Platform settings
+│   │   ├── analyticsController.js  # Analytics & statistics
+│   │   ├── authController.js       # Authentication
+│   │   ├── backupController.js     # Backup & restore
+│   │   ├── blockController.js      # User blocking
+│   │   ├── friendController.js     # Friend system
+│   │   ├── groupController.js      # Group chats
+│   │   ├── messageController.js    # Messaging
+│   │   ├── settingsController.js   # User settings
+│   │   ├── storyController.js      # Stories
+│   │   └── userController.js       # User profiles
+│   ├── middleware/
+│   │   ├── auth.js                 # JWT & admin auth
+│   │   ├── maintenance.js          # Maintenance mode
+│   │   └── upload.js               # File upload
+│   ├── models/
+│   │   ├── AdminSettings.js        # Platform settings
+│   │   ├── Connection.js           # DB connector
+│   │   ├── Conversation.js         # Direct messages
+│   │   ├── GroupConversation.js    # Group chats
+│   │   ├── Message.js              # Messages
+│   │   ├── Notification.js         # Notifications
+│   │   ├── Post.js                 # Posts
+│   │   ├── Story.js                # Stories
+│   │   └── User.js                 # Users
+│   ├── routes/
+│   │   ├── admin.js                # Admin user routes
+│   │   ├── adminSettings.js        # Settings routes
+│   │   ├── analytics.js            # Analytics routes
+│   │   ├── auth.js                 # Auth routes
+│   │   ├── backup.js               # Backup routes
+│   │   ├── block.js                # Block routes
+│   │   ├── friends.js              # Friend routes
+│   │   ├── groups.js               # Group routes
+- `SESSION_SECRET` - Session secret for OAuth
+
+### Optional Variables:
+- `PORT` - Server port (default: 5000)
+- `CLIENT_URL` - Frontend URL (default: http://localhost:3000)
+- `GOOGLE_CLIENT_ID` - For Google OAuth
+- `GOOGLE_CLIENT_SECRET` - For Google OAuth
+- `ENABLE_MONGOTOOLS` - Set to 'true' to use mongodump/mongorestore (default: JSON backups)routes
+│   ├── uploads/                    # User uploaded files
+│   │   ├── documents/
+│   │   ├── groups/
+│   │   ├── messages/
+│   │   ├── posts/
+│   │   ├── profiles/
+│   │   └── stories/
+│   ├── utils/                      # Utility functions
+│   ├── index.js                    # Server entry point
+│   ├── nodemon.json                # Nodemon config
 │   └── package.json
 │
 └── Frontend/
-    ├── public/          # Static files
+    ├── public/
+    │   ├── console-filter.js       # Console filtering
+    │   └── index.html
     ├── src/
-    │   ├── components/  # Reusable React components
-    │   ├── pages/       # Page components
-    │   ├── utils/       # Utility functions
-    │   ├── api.js       # API calls
-    │   ├── App.js       # Main App component
-    │   └── index.js     # React entry point
+    │   ├── components/
+    │   │   ├── AIChatbot.js        # AI chat assistant
+    │   │   ├── ChatBubble.js       # Chat messages
+    │   │   ├── CreateGroupModal.js # Group creation
+    │   │   ├── ForwardModal.js     # Message forwarding
+    │   │   ├── GlobalSearch.js     # Global search
+    │   │   ├── GroupInfoModal.js   # Group details
+    │   │   ├── ManageAccount.js    # Account management
+    │   │   ├── MusicPicker.js      # Spotify integration
+    │   │   ├── NotificationCenter.js # Notifications
+    │   │   ├── PeopleCard.js       # User cards
+    │   │   ├── PostCard.js         # Post display
+    │   │   ├── QRCodeModal.js      # QR profile sharing
+    │   │   ├── QRScanner.js        # QR scanning
+    │   │   ├── Sidebar.js          # Navigation
+    │   │   ├── StoryViewer.js      # Story viewer
+    │   │   ├── ThemeToggle.js      # Dark/light mode
+    │   │   ├── Toast.js            # Notifications
+    │   │   ├── UserProfileModal.js # User profiles
+    │   │   ├── VoiceMessageModal.js # Voice messages
+    │   │   └── VoiceRecorder.js    # Voice recording
+    │   ├── pages/
+    │   │   ├── AdminDashboard.js   # Admin overview
+    │   │   ├── AdminPosts.js       # Post management
+    │   │   ├── AdminReports.js     # Report management
+    │   │   ├── AdminSettings.js    # Platform settings
+    │   │   ├── AdminUsers.js       # User management
+    │   │   ├── Analytics.js        # Analytics dashboard
+    │   │   ├── AuthPage.js         # Login/signup
+    │   │   ├── Chat.js             # Chat interface
+    │   │   ├── Groups.js           # Groups page
+    │   │   ├── Home.js             # Home feed
+    │   │   ├── People.js           # Find friends
+    │   │   ├── Profile.js          # User profile
+    │   │   └── Settings.js         # User settings
+    │   ├── utils/
+    │   │   └── auth.js             # Auth utilities
+    │   ├── api.js                  # API client
+    │   ├── App.js                  # Main component
+    │   ├── App.css                 # Global styles
+    │   └── index.js                # Entry point
     └── package.json
 ```
 
@@ -161,22 +290,90 @@ mern/
 - Socket.io for instant messaging
 - Typing indicators
 - Online/offline status
-- Message read receipts
-- Real-time notifications
+- Voice messages with playback controls
+- File attachments (images, videos, documents)
 
 ### Security
 - JWT authentication
 - Password hashing with bcrypt
-- Message encryption
+- End-to-end message encryption
 - Two-factor authentication
 - Secure file upload validation
+- Rate limiting
+- Maintenance mode
+- Admin-only routes protection
+- Session timeout management
+
+### Admin Panel
+- **Analytics Dashboard**: Real-time metrics, user growth charts, engagement statistics
+- **User Management**: View, ban, unban users with role-based filtering
+- **Content Moderation**: Report review system with bulk actions
+- **Platform Settings**: Configure platform behavior, security, features
+- **Backup System**: Export/import database with JSON format support
 
 ### User Experience
 - Responsive design
 - Toast notifications
+- Dark/light theme toggle
 - Image/video support
 - Voice messages
 - File sharing (documents)
+- Story viewer with 24h expiry
+- EAPI Endpoints
+
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - User login
+- `POST /api/auth/forgot-password` - Password reset
+- `GET /api/auth/google` - Google OAuth
+
+### Admin Routes
+- `GET /api/admin/users` - Get all users (admin only)
+- `PUT /api/admin/users/:id/ban` - Ban/unban user
+- `GET /api/analytics/*` - Analytics endpoints
+- `GET /api/admin-settings` - Get platform settings
+- `PUT /api/admin-settings` - Update settings
+- `POST /api/backup/create` - Create backup
+- `GET /api/backup/export` - Export database
+
+### User Routes
+- `GET /api/users/:id` - Get user profile
+- `PUT /api/users/:id` - Update profile
+- `POST /api/posts` - Create post
+- `POST /api/messages` - Send message
+- `POST /api/stories` - Create story
+- `GET /api/notifications` - Get notifications
+
+## Admin Access
+
+To create an admin user, manually update a user document in MongoDB:
+```javascript
+db.users.updateOne(
+  { email: "admin@example.com" },
+  { $set: { role: "admin", isAdmin: true } }
+)
+```
+
+Or use the admin registration endpoint with proper authentication.
+
+## Backup & Restore
+
+The platform includes automatic backup functionality:
+- **JSON Backups**: Human-readable, works on all platforms
+- **Backup Location**: `Backend/backups/`
+- **Restoration**: Use admin settings panel to restore from backup
+- **Export**: Download database as JSON via admin panel
+
+## Support
+
+For support, open an issue in the repository.
+
+## Acknowledgments
+
+- Socket.io for real-time communication
+- MongoDB for database
+- React.js for frontend framework
+- Express.js for backend frameworktant (documents)
 - Story viewer
 - Emoji picker
 
