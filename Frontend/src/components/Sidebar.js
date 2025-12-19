@@ -21,7 +21,7 @@ import QRScanner from './QRScanner';
 
 const SOCKET_URL = 'http://localhost:5000';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen = false, onClose }) => {
     const location = useLocation();
     const history = useHistory();
     const [unreadMessages, setUnreadMessages] = useState(0);
@@ -107,6 +107,11 @@ const Sidebar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Close sidebar when route changes (useful on mobile)
+    useEffect(() => {
+        if (onClose) onClose();
+    }, [location.pathname]);
+
     // Clear unread messages count when on messages page
     useEffect(() => {
         if (location.pathname === '/messages') {
@@ -185,7 +190,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
             <div className="sidebar-header">
                 <Link to="/dashboard" className="logo">
                     <span className="logo-icon"><BoltIcon /></span>

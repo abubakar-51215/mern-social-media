@@ -1,0 +1,200 @@
+/* 
+ * Global Responsive Utilities
+ * This file contains common responsive utility classes
+ */
+
+/* Display utilities for different screen sizes */
+.hide-mobile {
+  display: block;
+}
+
+.hide-desktop {
+  display: none;
+}
+
+.show-mobile {
+  display: none;
+}
+
+/* Container utilities */
+.container-fluid {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1200px;
+}
+
+/* Responsive text sizes */
+.text-responsive {
+  font-size: clamp(14px, 2vw, 16px);
+}
+
+.heading-responsive {
+  font-size: clamp(20px, 4vw, 32px);
+}
+
+/* Flexible images */
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive spacing */
+.spacing-responsive {
+  padding: clamp(8px, 2vw, 20px);
+}
+
+.margin-responsive {
+  margin: clamp(8px, 2vw, 20px);
+}
+
+/* Media query breakpoints */
+@media (max-width: 1024px) {
+  .hide-tablet {
+    display: none !important;
+  }
+  
+  .show-tablet {
+    display: block !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  .show-mobile {
+    display: block !important;
+  }
+  
+  .hide-desktop {
+    display: block !important;
+  }
+  
+  .container {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+  
+  /* Force full width on mobile */
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* Stack columns on mobile */
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  /* Smaller gaps on mobile */
+  .mobile-gap-small {
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .hide-small-mobile {
+    display: none !important;
+  }
+  
+  .show-small-mobile {
+    display: block !important;
+  }
+  
+  .container,
+  .container-fluid {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+  
+  /* Even smaller text on very small screens */
+  .text-responsive {
+    font-size: 13px;
+  }
+  
+  .heading-responsive {
+    font-size: 18px;
+  }
+}
+
+/* Touch-friendly button sizes */
+@media (max-width: 768px) {
+  button,
+  .button,
+  .btn,
+  a.button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 16px;
+  }
+  
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    min-height: 44px;
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+body {
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Mobile-friendly scrollbars */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 2px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-left {
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+  
+  .safe-area-right {
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+}

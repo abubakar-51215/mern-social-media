@@ -1089,3 +1089,257 @@ button.send-btn:disabled {
   transform: translateY(0);
 }
 
+/* Mobile responsive styles */
+@media (max-width: 1024px) {
+  .messages-page {
+    margin-left: 0;
+  }
+  
+  .messages-sidebar {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 768px) {
+  .messages-page {
+    margin-left: 0;
+  }
+  
+  .messages-sidebar {
+    width: 100%;
+    max-width: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10;
+    transition: transform 0.3s ease;
+  }
+  
+  .messages-sidebar.hide-on-mobile {
+    transform: translateX(-100%);
+  }
+  
+  .chat-area {
+    width: 100%;
+  }
+  
+  .messages-header {
+    padding: 16px;
+  }
+  
+  .messages-header h2 {
+    font-size: 20px;
+  }
+  
+  .new-group-btn,
+  .new-message-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .chat-tabs {
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .search-messages {
+    padding: 12px 16px;
+  }
+  
+  .search-messages input {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .conversation-item {
+    padding: 12px 16px;
+  }
+  
+  .conv-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+  
+  .conv-name {
+    font-size: 14px;
+  }
+  
+  .conv-time {
+    font-size: 11px;
+  }
+  
+  .last-message {
+    font-size: 13px;
+  }
+  
+  .chat-header {
+    padding: 16px;
+  }
+  
+  .chat-avatar {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .chat-user-info h3 {
+    font-size: 15px;
+  }
+  
+  .chat-username,
+  .chat-status {
+    font-size: 12px;
+  }
+  
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .messages-container {
+    padding: 16px;
+  }
+  
+  .message {
+    margin-bottom: 12px;
+  }
+  
+  .encryption-indicator {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .messages-header {
+    padding: 12px;
+  }
+  
+  .messages-header h2 {
+    font-size: 18px;
+  }
+  
+  .new-group-btn,
+  .new-message-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .chat-tabs {
+    padding: 8px 12px;
+    gap: 6px;
+  }
+  
+  .tab-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  
+  .search-messages {
+    padding: 10px 12px;
+  }
+  
+  .search-messages input {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+  
+  .conversation-item {
+    padding: 10px 12px;
+  }
+  
+  .conv-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+  
+  .online-indicator {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .conv-name {
+    font-size: 13px;
+  }
+  
+  .conv-time {
+    font-size: 10px;
+  }
+  
+  .last-message {
+    font-size: 12px;
+  }
+  
+  .unread-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    min-width: 18px;
+    height: 18px;
+  }
+  
+  .chat-header {
+    padding: 12px;
+  }
+  
+  .chat-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .avatar-status-indicator {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .chat-user-info h3 {
+    font-size: 14px;
+  }
+  
+  .chat-username,
+  .chat-status {
+    font-size: 11px;
+  }
+  
+  .encryption-indicator {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .messages-container {
+    padding: 12px;
+  }
+  
+  .message {
+    margin-bottom: 10px;
+  }
+  
+  .coming-soon-content h2 {
+    font-size: 22px;
+  }
+  
+  .coming-soon-content p {
+    font-size: 14px;
+  }
+  
+  .coming-soon-btn {
+    padding: 12px 32px;
+    font-size: 14px;
+  }
+}

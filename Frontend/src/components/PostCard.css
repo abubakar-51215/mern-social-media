@@ -1112,3 +1112,314 @@
   color: #6b7280;
   font-size: 15px;
 }
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+  .post-card {
+    border-radius: 16px;
+  }
+  
+  .post-header {
+    padding: 12px;
+  }
+  
+  .post-avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .post-username {
+    font-size: 14px;
+  }
+  
+  .post-time {
+    font-size: 12px;
+  }
+  
+  .icon-btn {
+    font-size: 16px;
+  }
+  
+  .post-content {
+    padding: 0 12px 10px;
+  }
+  
+  .post-content p {
+    font-size: 14px;
+  }
+  
+  .post-image {
+    max-height: 400px;
+  }
+  
+  .post-image img {
+    max-height: 400px;
+  }
+  
+  .post-stats {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  /* Action bar: icon-only like Instagram */
+  .post-actions {
+    gap: 6px;
+  }
+  .post-actions .action-btn {
+    padding: 10px;
+  }
+  .post-actions .action-btn span:last-child {
+    display: none; /* hide label, keep icon */
+  }
+  .post-actions .action-btn .action-icon {
+    font-size: 22px;
+  }
+  
+  .post-actions {
+    padding: 6px 4px;
+    gap: 6px;
+  }
+  
+  .action-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .action-icon {
+    font-size: 18px;
+  }
+  
+  .comments-section {
+    padding: 10px 12px;
+  }
+  
+  .comment-input input {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  
+  .comment-send-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+  }
+  
+  .music-player {
+    gap: 10px;
+  }
+  
+  .music-icon-pulse {
+    font-size: 24px;
+  }
+  
+  .music-title-display {
+    font-size: 13px;
+  }
+  
+  .music-artist-display {
+    font-size: 11px;
+  }
+  
+  .music-play-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+  
+  .emoji-picker {
+    width: 280px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(7, 1fr);
+    max-height: 200px;
+  }
+  
+  .likes-modal {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    margin: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .post-card {
+    border-radius: 12px;
+  }
+  
+  .post-header {
+    padding: 10px;
+  }
+  
+  .post-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .post-username {
+    font-size: 13px;
+  }
+  
+  .post-time {
+    font-size: 11px;
+  }
+  
+  .verified-badge {
+    width: 14px;
+    height: 14px;
+    font-size: 9px;
+  }
+  
+  .icon-btn {
+    font-size: 15px;
+    padding: 3px;
+  }
+  
+  .post-content {
+    padding: 0 10px 8px;
+  }
+  
+  .post-content p {
+    font-size: 13px;
+  }
+  
+  .post-image {
+    max-height: 300px;
+  }
+  
+  .post-image img {
+    max-height: 300px;
+  }
+  
+  .multi-image-indicator {
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    font-size: 12px;
+  }
+  
+  .post-stats {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  /* Action bar: compact icons on small mobile */
+  .post-actions {
+    gap: 4px;
+  }
+  .post-actions .action-btn {
+    padding: 8px;
+    min-width: 44px; /* touch target */
+  }
+  .post-actions .action-btn span:last-child {
+    display: none;
+  }
+  .post-actions .action-btn .action-icon {
+    font-size: 20px;
+  }
+  
+  .post-actions {
+    padding: 5px 3px;
+    gap: 4px;
+  }
+  
+  .action-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .action-icon {
+    font-size: 16px;
+  }
+  
+  .comments-section {
+    padding: 8px 10px;
+  }
+  
+  .comment-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .comment-input {
+    gap: 6px;
+  }
+  
+  .comment-input input {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  
+  .comment-send-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .emoji-btn {
+    font-size: 18px;
+  }
+  
+  .emoji-picker {
+    width: calc(100vw - 40px);
+    max-width: 260px;
+  }
+  
+  .emoji-grid {
+    grid-template-columns: repeat(6, 1fr);
+    max-height: 180px;
+    padding: 8px;
+  }
+  
+  .emoji-item {
+    font-size: 24px;
+    padding: 4px;
+  }
+  
+  .post-music {
+    padding: 10px 12px;
+  }
+  
+  .music-player {
+    gap: 8px;
+  }
+  
+  .music-icon-pulse {
+    font-size: 20px;
+  }
+  
+  .music-title-display {
+    font-size: 12px;
+  }
+  
+  .music-artist-display {
+    font-size: 10px;
+  }
+  
+  .music-play-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  
+  .edit-textarea {
+    font-size: 13px;
+    padding: 10px;
+  }
+  
+  .cancel-btn, .save-btn {
+    padding: 6px 16px;
+    font-size: 13px;
+  }
+  
+  .likes-modal {
+    width: calc(100% - 24px);
+    margin: 12px;
+    max-height: calc(100vh - 60px);
+  }
+  
+  .likes-modal-header h3 {
+    font-size: 16px;
+  }
+  
+  .close-modal-btn {
+    font-size: 24px;
+  }
+}

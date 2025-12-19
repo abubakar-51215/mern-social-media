@@ -19,6 +19,24 @@
   z-index: 100;
 }
 
+.menu-button {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--card-bg);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.menu-button:hover {
+  background: var(--bg-secondary);
+}
+
 .search-bar {
   position: relative;
   flex: 1 1 640px;
@@ -657,30 +675,207 @@
 @media (max-width: 1024px) {
   .main-wrapper {
     flex-direction: column;
+    width: calc(100% - 230px);
+  }
+
+  .menu-button {
+    display: inline-flex;
   }
 
   .right-sidebar {
     width: 100%;
     position: relative;
+    top: 0;
+    margin-top: 20px;
+  }
+  
+  .notification-dropdown {
+    width: 320px;
   }
 }
 
 @media (max-width: 768px) {
+  .dashboard-header {
+    left: 0;
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+  
+  .search-bar {
+    max-width: 100%;
+  }
+
+  .menu-button {
+    margin-right: 8px;
+  }
+  
+  .header-actions {
+    position: static;
+    right: auto;
+    gap: 8px;
+  }
+  
+  .icon-button {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .notification-dropdown {
+    width: 280px;
+    right: -16px;
+  }
+  
+  .search-dropdown {
+    left: -16px;
+    right: -16px;
+    width: calc(100vw - 32px);
+  }
+  
   .main-wrapper {
     margin-left: 0;
     padding: 12px;
+    width: 100%;
   }
 
   .feed-container {
     max-width: 100%;
+    margin-top: 74px;
   }
 
   .stories-section {
     gap: 8px;
+    padding: 12px 0;
   }
 
   .story-card {
     min-width: 100px;
+    max-width: 100px;
+    width: 100px;
     height: 160px;
   }
+  
+  .story-user-avatar {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+    left: 8px;
+  }
+  
+  .story-username {
+    bottom: 8px;
+    left: 8px;
+    font-size: 11px;
+  }
+  
+  .create-story .story-plus {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
 }
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    padding: 0 12px;
+    height: 56px;
+    justify-content: space-between;
+  }
+  
+  .search-bar input {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+  
+  .header-actions {
+    position: static;
+    right: auto;
+    gap: 6px;
+  }
+
+  .menu-button {
+    width: 40px;
+    height: 40px;
+  }
+  
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 999;
+}
+  .icon-button {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+  
+  .notification-count-badge {
+    font-size: 10px;
+    padding: 1px 4px;
+    min-width: 16px;
+    height: 16px;
+  }
+  
+  .notification-dropdown {
+    width: calc(100vw - 24px);
+    right: -12px;
+  }
+  
+  .search-dropdown {
+    left: -12px;
+    right: -12px;
+    width: calc(100vw - 24px);
+  }
+  
+  .main-wrapper {
+    padding: 8px;
+  }
+  
+  .feed-container {
+    margin-top: 66px;
+  }
+  
+  .stories-section {
+    gap: 6px;
+    padding: 10px 0;
+  }
+  
+  .story-card {
+    min-width: 105px;
+    max-width: 90px;
+    width: 90px;
+    height: 140px;
+  }
+  
+  .story-user-avatar {
+    width: 28px;
+    height: 28px;
+    top: 6px;
+    left: 6px;
+    border-width: 2px;
+  }
+  
+  .story-username {
+    bottom: 6px;
+    left: 6px;
+    font-size: 10px;
+  }
+  
+  .create-story .story-plus {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+  
+  .story-text-preview {
+    padding: 12px;
+    font-size: 12px;
+  }
+  
+  .story-type-icon {
+    font-size: 20px;
+  }
+}
+

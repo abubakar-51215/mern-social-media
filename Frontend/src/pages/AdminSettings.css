@@ -444,7 +444,7 @@ small {
   input[type="number"],
   textarea,
   select {
-    max-width: 100%;
+    max-width: 90%;
   }
 
   textarea {

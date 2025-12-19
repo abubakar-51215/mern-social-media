@@ -484,9 +484,11 @@ body, html, #root {
 
 /* Responsive */
 @media (max-width: 1200px){
+  .auth-page {
+    padding: 20px 40px;
+  }
   .auth-container{ 
     flex-direction: column; 
-    padding: 40px 32px; 
     gap: 40px; 
   }
   .logo-global{
@@ -498,11 +500,224 @@ body, html, #root {
     text-align: left;
   }
   .hero-content h1{ 
-    font-size: 56px; 
-    line-height: 1.05; 
+    font-size: 48px; 
+    line-height: 1.1; 
   }
   .auth-right{ 
     width: 100%; 
-    max-width: 450px;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 15px 20px;
+    min-height: 100vh;
+    height: auto;
+  }
+  
+  .logo-global {
+    left: 20px;
+    top: 20px;
+  }
+  
+  .logo-global .logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .logo-global .logo-text {
+    font-size: 18px;
+  }
+  
+  .auth-container {
+    flex-direction: column;
+    gap: 30px;
+    max-width: 100%;
+    padding-top: 60px;
+  }
+  
+  .auth-left {
+    text-align: center;
+    padding: 0;
+  }
+  
+  .testimonial {
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .user-avatars img {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .hero-content h1 {
+    font-size: 36px;
+    line-height: 1.2;
+    letter-spacing: -1px;
+  }
+  
+  .hero-content p {
+    font-size: 18px;
+  }
+  
+  .auth-right {
+    width: 100%;
+    max-width: 100%;
+    max-height: none;
+  }
+  
+  .auth-form-container {
+    max-height: none;
+    padding: 20px;
+  }
+  
+  .auth-header h2 {
+    font-size: 20px;
+  }
+  
+  .auth-header p {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  
+  .google-btn {
+    height: 44px;
+    font-size: 14px;
+  }
+  
+  .divider {
+    margin: 16px 0;
+    font-size: 12px;
+  }
+  
+  .form-group {
+    gap: 0;
+  }
+  
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+  
+  .form-group input {
+    height: 44px;
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+  
+  .continue-btn {
+    height: 44px;
+    font-size: 14px;
+    margin-top: 12px;
+  }
+  
+  .auth-switch {
+    font-size: 13px;
+    margin-top: 16px;
+  }
+  
+  .link-btn {
+    font-size: 14px;
+  }
+  
+  .auth-footer {
+    font-size: 11px;
+    margin-top: 12px;
+  }
+  
+  .forgot-password-modal {
+    padding: 24px;
+    margin: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 10px 15px;
+  }
+  
+  .logo-global {
+    left: 15px;
+    top: 15px;
+  }
+  
+  .logo-global .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logo-global .logo-text {
+    font-size: 16px;
+  }
+  
+  .auth-container {
+    gap: 20px;
+    padding-top: 50px;
+  }
+  
+  .user-avatars img {
+    width: 32px;
+    height: 32px;
+    margin-left: -10px;
+  }
+  
+  .stars {
+    font-size: 14px;
+  }
+  
+  .testimonial-text {
+    font-size: 12px;
+  }
+  
+  .hero-content h1 {
+    font-size: 28px;
+    line-height: 1.25;
+    letter-spacing: -0.8px;
+  }
+  
+  .hero-content p {
+    font-size: 16px;
+  }
+  
+  .auth-form-container {
+    padding: 18px;
+  }
+  
+  .auth-header h2 {
+    font-size: 18px;
+  }
+  
+  .auth-header p {
+    font-size: 12px;
+  }
+  
+  .google-btn {
+    height: 42px;
+    font-size: 13px;
+  }
+  
+  .form-group input {
+    height: 42px;
+    font-size: 13px;
+  }
+  
+  .continue-btn {
+    height: 42px;
+    font-size: 13px;
+  }
+  
+  .forgot-password-modal {
+    padding: 20px;
+    margin: 15px;
+  }
+  
+  .forgot-password-modal h3 {
+    font-size: 20px;
+  }
+  
+  .forgot-password-modal p {
+    font-size: 13px;
   }
 }

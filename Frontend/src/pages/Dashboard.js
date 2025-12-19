@@ -8,6 +8,7 @@ import { searchUsers, getUnreadNotificationsCount } from '../api';
 import AddIcon from '@mui/icons-material/Add';
 import GroupsIcon from '@mui/icons-material/Groups';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import MenuIcon from '@mui/icons-material/Menu';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const notificationRef = useRef(null);
   const searchRef = useRef(null);
   const debounceTimer = useRef(null);
@@ -74,11 +76,11 @@ const Dashboard = () => {
       { _id: 'd1', user: { _id: 'u1', name: 'Emma Watson', profilePicture: 'https://i.pravatar.cc/150?img=1' }, content: 'Just launched my new AI-powered app! Check it out 🚀', category: 'Technology', likes: [{ _id: 'u2', name: 'Alex Turner', profilePicture: 'https://i.pravatar.cc/150?img=12' }, { _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }], comments: [], createdAt: new Date(Date.now() - 3600000).toISOString(), image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600' },
       { _id: 'd2', user: { _id: 'u2', name: 'Alex Turner', profilePicture: 'https://i.pravatar.cc/150?img=12' }, content: 'Beautiful sunset in Santorini 🌅 #Travel', category: 'Travel', likes: [{ _id: 'u1', name: 'Emma Watson', profilePicture: 'https://i.pravatar.cc/150?img=1' }], comments: [], createdAt: new Date(Date.now() - 7200000).toISOString(), image: 'https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=600' },
       { _id: 'd3', user: { _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }, content: 'Made some homemade pasta today! Recipe in comments 🍝', category: 'Food', likes: [], comments: [], createdAt: new Date(Date.now() - 10800000).toISOString(), image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600' },
-      { _id: 'd4', user: { _id: 'u5', name: 'Maria Garcia', profilePicture: 'https://i.pravatar.cc/150?img=9' }, content: 'Amazing game last night! 🏀 Best performance of the season', category: 'Sports', likes: [{ _id: 'u4', name: 'James Wilson', profilePicture: 'https://i.pravatar.cc/150?img=8' }], comments: [], createdAt: new Date(Date.now() - 18000000).toISOString(), video: 'https://www.youtube.com/embed/NpEaa2P7qZI' },
-      { _id: 'd5', user: { _id: 'u6', name: 'David Kim', profilePicture: 'https://i.pravatar.cc/150?img=14' }, content: 'Working on my latest track. Music is life 🎵', category: 'Music', likes: [], comments: [], createdAt: new Date(Date.now() - 21600000).toISOString(), video: 'https://www.youtube.com/embed/Zi_XLOBDo_Y' },
+      { _id: 'd4', user: { _id: 'u5', name: 'Maria Garcia', profilePicture: 'https://i.pravatar.cc/150?img=9' }, content: 'Amazing game last night! 🏀 Best performance of the season', category: 'Sports', likes: [{ _id: 'u4', name: 'James Wilson', profilePicture: 'https://i.pravatar.cc/150?img=8' }], comments: [], createdAt: new Date(Date.now() - 18000000).toISOString(), image: 'https://images.unsplash.com/photo-1504457047772-27faf1c00561?w=600' },
+      { _id: 'd5', user: { _id: 'u6', name: 'David Kim', profilePicture: 'https://i.pravatar.cc/150?img=14' }, content: 'Working on my latest track. Music is life 🎵', category: 'Music', likes: [], comments: [], createdAt: new Date(Date.now() - 21600000).toISOString(), image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=600' },
       { _id: 'd6', user: { _id: 'u7', name: 'Lisa Anderson', profilePicture: 'https://i.pravatar.cc/150?img=10' }, content: 'Finished my oil painting today! What do you think? 🎨', category: 'Art', likes: [{ _id: 'u1', name: 'Emma Watson', profilePicture: 'https://i.pravatar.cc/150?img=1' }, { _id: 'u5', name: 'Maria Garcia', profilePicture: 'https://i.pravatar.cc/150?img=9' }], comments: [], createdAt: new Date(Date.now() - 25200000).toISOString(), image: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600' },
-      { _id: 'd7', user: { _id: 'u9', name: 'Sarah Johnson', profilePicture: 'https://i.pravatar.cc/150?img=16' }, content: 'Hiking through the Swiss Alps. Nature is incredible! ⛰️', category: 'Travel', likes: [{ _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }, { _id: 'u4', name: 'James Wilson', profilePicture: 'https://i.pravatar.cc/150?img=8' }], comments: [], createdAt: new Date(Date.now() - 32400000).toISOString(), video: 'https://www.youtube.com/embed/LXb3EKWsInQ' },
-      { _id: 'd8', user: { _id: 'u11', name: 'Emily Davis', profilePicture: 'https://i.pravatar.cc/150?img=25' }, content: 'Summer vibes with my new outfit 👗☀️', category: 'Fashion', likes: [{ _id: 'u2', name: 'Alex Turner', profilePicture: 'https://i.pravatar.cc/150?img=12' }, { _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }], comments: [], createdAt: new Date(Date.now() - 39600000).toISOString(), video: 'https://www.youtube.com/embed/jNQXAC9IVRw' },
+      { _id: 'd7', user: { _id: 'u9', name: 'Sarah Johnson', profilePicture: 'https://i.pravatar.cc/150?img=16' }, content: 'Hiking through the Swiss Alps. Nature is incredible! ⛰️', category: 'Travel', likes: [{ _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }, { _id: 'u4', name: 'James Wilson', profilePicture: 'https://i.pravatar.cc/150?img=8' }], comments: [], createdAt: new Date(Date.now() - 32400000).toISOString(), image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600' },
+      { _id: 'd8', user: { _id: 'u11', name: 'Emily Davis', profilePicture: 'https://i.pravatar.cc/150?img=25' }, content: 'Summer vibes with my new outfit 👗☀️', category: 'Fashion', likes: [{ _id: 'u2', name: 'Alex Turner', profilePicture: 'https://i.pravatar.cc/150?img=12' }, { _id: 'u3', name: 'Sophie Chen', profilePicture: 'https://i.pravatar.cc/150?img=5' }], comments: [], createdAt: new Date(Date.now() - 39600000).toISOString(), image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600' },
     ];
     return discoverPosts;
   };
@@ -544,8 +546,16 @@ What's your favorite JS feature?`,
 
   return (
     <div className="dashboard">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)} />}
       <div className="dashboard-header">
+        <button
+          className="menu-button"
+          aria-label="Open navigation"
+          onClick={() => setIsSidebarOpen(true)}
+        >
+          <MenuIcon />
+        </button>
         <div className="search-bar" ref={searchRef}>
           <input 
             type="text" 
