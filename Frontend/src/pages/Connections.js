@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import io from 'socket.io-client';
+import { getSocket } from '../socket';
 import { toast } from '../components/Toast';
 import { 
   getFriendRequests, 
@@ -13,8 +13,6 @@ import {
   removeFriend
 } from '../api';
 import './Connections.css';
-
-const SOCKET_URL = 'http://localhost:5000';
 
 const Connections = () => {
   const [activeTab, setActiveTab] = useState('friends');
@@ -44,31 +42,38 @@ const Connections = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     // Initialize Socket.io connection
-    socketRef.current = io(SOCKET_URL);
-    socketRef.current.emit('join', user._id);
+    socketRef.current = getSocket();
+    if (user?._id) {
+      socketRef.current.emit('join', user._id);
+    }
 
     // Listen for friend request events
-    socketRef.current.on('friendRequestReceived', (data) => {
+    const handleFriendRequestReceived = (data) => {
       showMessage(`New friend request from ${data.from?.name || 'Someone'}!`);
       // Reload all data to update counts
       loadAllData();
-    });
+    };
+    socketRef.current.on('friendRequestReceived', handleFriendRequestReceived);
 
-    socketRef.current.on('friendRequestAccepted', (data) => {
+    const handleFriendRequestAccepted = (data) => {
       showMessage(`${data.from?.name || 'Someone'} accepted your friend request!`);
       // Reload all data to update counts
       loadAllData();
-    });
+    };
+    socketRef.current.on('friendRequestAccepted', handleFriendRequestAccepted);
 
-    socketRef.current.on('friendRequestRejected', () => {
+    const handleFriendRequestRejected = () => {
       showMessage(`Your friend request was declined`, true);
       // Reload all data to update counts
       loadAllData();
-    });
+    };
+    socketRef.current.on('friendRequestRejected', handleFriendRequestRejected);
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.disconnect();
+        socketRef.current.off('friendRequestReceived', handleFriendRequestReceived);
+        socketRef.current.off('friendRequestAccepted', handleFriendRequestAccepted);
+        socketRef.current.off('friendRequestRejected', handleFriendRequestRejected);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

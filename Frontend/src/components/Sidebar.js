@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useHistory } from 'react-router-dom';
-import io from 'socket.io-client';
+import { getSocket } from '../socket';
 import HomeIcon from '@mui/icons-material/Home';
 import ChatIcon from '@mui/icons-material/Chat';
 import PeopleIcon from '@mui/icons-material/People';
@@ -19,8 +19,6 @@ import ManageAccount from './ManageAccount';
 import QRCodeModal from './QRCodeModal';
 import QRScanner from './QRScanner';
 
-const SOCKET_URL = 'http://localhost:5000';
-
 const Sidebar = ({ isOpen = false, onClose }) => {
     const location = useLocation();
     const history = useHistory();
@@ -35,6 +33,11 @@ const Sidebar = ({ isOpen = false, onClose }) => {
     const socketRef = useRef(null);
     const currentUserRef = useRef(null);
     const userMenuRef = useRef(null);
+    const locationRef = useRef(location.pathname);
+
+    useEffect(() => {
+        locationRef.current = location.pathname;
+    }, [location.pathname]);
 
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem('user') || '{}');
@@ -46,9 +49,11 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         setTheme(savedTheme);
         document.documentElement.setAttribute('data-theme', savedTheme);
 
-        // Initialize Socket.io connection
-        socketRef.current = io(SOCKET_URL);
-        socketRef.current.emit('join', userData._id);
+        // Initialize Socket.io connection (shared singleton)
+        socketRef.current = getSocket();
+        if (userData?._id) {
+            socketRef.current.emit('join', userData._id);
+        }
 
         // Fetch initial counts
         fetchUnreadCounts();
@@ -67,34 +72,41 @@ const Sidebar = ({ isOpen = false, onClose }) => {
         window.addEventListener('profileUpdated', handleProfileUpdate);
 
         // Listen for new messages
-        socketRef.current.on('receiveMessage', (data) => {
+        const handleReceiveMessage = () => {
             // Increment unread count if not on messages page
-            if (location.pathname !== '/messages') {
+            if (locationRef.current !== '/messages') {
                 setUnreadMessages(prev => prev + 1);
             }
-        });
+        };
+        socketRef.current.on('receiveMessage', handleReceiveMessage);
 
         // Listen for friend request events
-        socketRef.current.on('friendRequestReceived', () => {
+        const handleFriendRequestReceived = () => {
             setFriendRequests(prev => prev + 1);
-        });
+        };
+        socketRef.current.on('friendRequestReceived', handleFriendRequestReceived);
 
-        socketRef.current.on('friendRequestAccepted', () => {
+        const handleFriendRequestAccepted = () => {
             // Optionally show a notification
-        });
+        };
+        socketRef.current.on('friendRequestAccepted', handleFriendRequestAccepted);
 
         // Listen for new notifications (likes, comments, follows)
-        socketRef.current.on('newNotification', (data) => {
+        const handleNewNotification = () => {
             // Trigger notification refresh or show toast
-        });
+        };
+        socketRef.current.on('newNotification', handleNewNotification);
 
         return () => {
             if (socketRef.current) {
-                socketRef.current.disconnect();
+                socketRef.current.off('receiveMessage', handleReceiveMessage);
+                socketRef.current.off('friendRequestReceived', handleFriendRequestReceived);
+                socketRef.current.off('friendRequestAccepted', handleFriendRequestAccepted);
+                socketRef.current.off('newNotification', handleNewNotification);
             }
             window.removeEventListener('profileUpdated', handleProfileUpdate);
         };
-    }, [location.pathname]);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {

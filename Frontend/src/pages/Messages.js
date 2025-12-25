@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import io from 'socket.io-client';
+import { getSocket } from '../socket';
 import Sidebar from '../components/Sidebar';
 import EnhancedChatBubble from '../components/EnhancedChatBubble';
 import VoiceRecorder from '../components/VoiceRecorder';
@@ -507,22 +507,23 @@ const Messages = () => {
     const token = localStorage.getItem('token');
     if (!token || !currentUser?._id) return;
 
-    socketRef.current = io('http://localhost:5000', {
-      auth: { token },
-      transports: ['websocket', 'polling']
-    });
+    const socket = getSocket();
+    socketRef.current = socket;
 
-    socketRef.current.on('connect', () => {
+    // Ensure join is emitted even if socket was created elsewhere.
+    socket.emit('join', currentUser._id);
+
+    const handleConnect = () => {
       console.log('Socket connected, joining with userId:', currentUser._id);
-      // IMPORTANT: Emit join event to register this user's socket
-      socketRef.current.emit('join', currentUser._id);
-    });
+      socket.emit('join', currentUser._id);
+    };
 
-    socketRef.current.on('connect_error', (error) => {
-      console.error('Socket connection error:', error);
-    });
+    const handleConnectError = (error) => {
+      // Non-fatal: Socket.IO may fallback transports.
+      console.warn('Socket connection error:', error?.message || error);
+    };
 
-    socketRef.current.on('receiveMessage', (data) => {
+    const handleReceiveMessage = (data) => {
       console.log('Received message via socket:', data);
       // data contains { conversationId, message }
       const message = data.message || data;
@@ -539,12 +540,11 @@ const Messages = () => {
       }
       // Always reload conversations to update sidebar
       loadConversations();
-    });
+    };
 
-    socketRef.current.on('reactionAdded', ({ messageId, reaction }) => {
+    const handleReactionAdded = ({ messageId, reaction }) => {
       if (!reaction) return;
       const { emoji, user } = reaction;
-      
       setMessages(prev => prev.map(msg => {
         if (msg._id === messageId) {
           const userId = user?._id || user;
@@ -552,7 +552,7 @@ const Messages = () => {
             const rUserId = r.user?._id || r.user;
             return rUserId === userId;
           });
-          
+
           if (existingReaction) {
             return {
               ...msg,
@@ -561,18 +561,18 @@ const Messages = () => {
                 return rUserId === userId ? { ...r, emoji } : r;
               })
             };
-          } else {
-            return {
-              ...msg,
-              reactions: [...(msg.reactions || []), { emoji, user }]
-            };
           }
+
+          return {
+            ...msg,
+            reactions: [...(msg.reactions || []), { emoji, user }]
+          };
         }
         return msg;
       }));
-    });
+    };
 
-    socketRef.current.on('reactionRemoved', ({ messageId, userId }) => {
+    const handleReactionRemoved = ({ messageId, userId }) => {
       setMessages(prev => prev.map(msg => {
         if (msg._id === messageId) {
           return {
@@ -585,135 +585,172 @@ const Messages = () => {
         }
         return msg;
       }));
-    });
+    };
 
-    socketRef.current.on('messageDeleted', ({ messageId }) => {
+    const handleMessageDeleted = ({ messageId }) => {
       setMessages(prev => prev.map(msg => {
         if (msg._id === messageId) {
           return { ...msg, isDeleted: true, text: 'This message was deleted', image: null, video: null, audio: null, file: null, fileName: null, fileSize: null };
         }
         return msg;
       }));
-    });
+    };
 
-    socketRef.current.on('messageEdited', ({ messageId, text, editedAt }) => {
+    const handleMessageEdited = ({ messageId, text, editedAt }) => {
       setMessages(prev => prev.map(msg => {
         if (msg._id === messageId) {
           return { ...msg, text, isEdited: true, editedAt };
         }
         return msg;
       }));
-    });
+    };
 
-    // Group chat socket listeners
-    socketRef.current.on('groupMessage', ({ groupId, message }) => {
+    const handleGroupMessage = ({ groupId, message }) => {
       if (selectedChatRef.current?._id === groupId && chatType === 'group') {
         setMessages(prev => [...prev, message]);
         scrollToBottom();
       }
       loadGroups();
-    });
+    };
 
-    socketRef.current.on('groupCreated', (group) => {
+    const handleGroupCreated = (group) => {
       setGroups(prev => [group, ...prev]);
-    });
+    };
 
-    socketRef.current.on('groupUpdated', (group) => {
+    const handleGroupUpdated = (group) => {
       setGroups(prev => prev.map(g => g._id === group._id ? group : g));
       if (selectedChatRef.current?._id === group._id) {
         setSelectedChat(group);
       }
-    });
+    };
 
-    socketRef.current.on('groupMembersAdded', ({ groupId, newMembers }) => {
+    const handleGroupMembersAdded = ({ groupId, newMembers }) => {
       setGroups(prev => prev.map(g => {
         if (g._id === groupId) {
           return { ...g, members: [...g.members, ...newMembers] };
         }
         return g;
       }));
-    });
+    };
 
-    socketRef.current.on('groupMemberRemoved', ({ groupId, memberId }) => {
+    const handleGroupMemberRemoved = ({ groupId, memberId }) => {
       setGroups(prev => prev.map(g => {
         if (g._id === groupId) {
           return { ...g, members: g.members.filter(m => (m.user._id || m.user) !== memberId) };
         }
         return g;
       }));
-    });
+    };
 
-    socketRef.current.on('removedFromGroup', ({ groupId }) => {
+    const handleRemovedFromGroup = ({ groupId }) => {
       setGroups(prev => prev.filter(g => g._id !== groupId));
       if (selectedChatRef.current?._id === groupId) {
         setSelectedChat(null);
         setMessages([]);
       }
-    });
+    };
 
-    socketRef.current.on('groupDeleted', ({ groupId }) => {
+    const handleGroupDeleted = ({ groupId }) => {
       setGroups(prev => prev.filter(g => g._id !== groupId));
       if (selectedChatRef.current?._id === groupId) {
         setSelectedChat(null);
         setMessages([]);
       }
-    });
+    };
 
-    socketRef.current.on('userTyping', ({ conversationId, userId, userName }) => {
+    const handleUserTyping = ({ conversationId, userId, userName }) => {
       if (selectedChatRef.current?._id === conversationId && userId !== currentUser._id) {
         setIsTyping(true);
         setTypingUser({ _id: userId, name: userName });
       }
-    });
+    };
 
-    socketRef.current.on('userStoppedTyping', ({ conversationId, userId }) => {
+    const handleUserStoppedTyping = ({ conversationId, userId }) => {
       if (selectedChatRef.current?._id === conversationId && userId !== currentUser._id) {
         setIsTyping(false);
         setTypingUser(null);
       }
-    });
+    };
 
-    // Online/Offline status listeners
-    socketRef.current.on('userOnline', ({ userId, lastSeen }) => {
+    const handleUserOnline = ({ userId, lastSeen }) => {
       setOnlineUsers(prev => ({
         ...prev,
         [userId]: { isOnline: true, lastSeen, status: 'online' }
       }));
-    });
+    };
 
-    socketRef.current.on('userOffline', ({ userId, lastSeen }) => {
+    const handleUserOffline = ({ userId, lastSeen }) => {
       setOnlineUsers(prev => ({
         ...prev,
         [userId]: { isOnline: false, lastSeen, status: 'offline' }
       }));
-    });
+    };
 
-    socketRef.current.on('activityStatusChanged', ({ userId, status }) => {
+    const handleActivityStatusChanged = ({ userId, status }) => {
       setOnlineUsers(prev => ({
         ...prev,
         [userId]: { ...prev[userId], status, lastSeen: new Date() }
       }));
-    });
+    };
 
-    socketRef.current.on('messagesSeen', ({ conversationId }) => {
+    const handleMessagesSeen = ({ conversationId }) => {
       if (selectedChatRef.current?._id === conversationId) {
         setMessages(prev => prev.map(msg => ({ ...msg, read: true, seenAt: new Date() })));
       }
-    });
+    };
 
-    // Handle conversation updates (for real-time sidebar updates)
-    socketRef.current.on('conversationUpdated', ({ conversationId, lastMessage, lastMessageTime }) => {
-      setConversations(prev => prev.map(conv => 
-        conv._id === conversationId 
+    const handleConversationUpdated = ({ conversationId, lastMessage, lastMessageTime }) => {
+      setConversations(prev => prev.map(conv =>
+        conv._id === conversationId
           ? { ...conv, lastMessage, lastMessageTime, unreadCount: (conv.unreadCount || 0) + 1 }
           : conv
       ));
-    });
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('connect_error', handleConnectError);
+    socket.on('receiveMessage', handleReceiveMessage);
+    socket.on('reactionAdded', handleReactionAdded);
+    socket.on('reactionRemoved', handleReactionRemoved);
+    socket.on('messageDeleted', handleMessageDeleted);
+    socket.on('messageEdited', handleMessageEdited);
+    socket.on('groupMessage', handleGroupMessage);
+    socket.on('groupCreated', handleGroupCreated);
+    socket.on('groupUpdated', handleGroupUpdated);
+    socket.on('groupMembersAdded', handleGroupMembersAdded);
+    socket.on('groupMemberRemoved', handleGroupMemberRemoved);
+    socket.on('removedFromGroup', handleRemovedFromGroup);
+    socket.on('groupDeleted', handleGroupDeleted);
+    socket.on('userTyping', handleUserTyping);
+    socket.on('userStoppedTyping', handleUserStoppedTyping);
+    socket.on('userOnline', handleUserOnline);
+    socket.on('userOffline', handleUserOffline);
+    socket.on('activityStatusChanged', handleActivityStatusChanged);
+    socket.on('messagesSeen', handleMessagesSeen);
+    socket.on('conversationUpdated', handleConversationUpdated);
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      socket.off('connect', handleConnect);
+      socket.off('connect_error', handleConnectError);
+      socket.off('receiveMessage', handleReceiveMessage);
+      socket.off('reactionAdded', handleReactionAdded);
+      socket.off('reactionRemoved', handleReactionRemoved);
+      socket.off('messageDeleted', handleMessageDeleted);
+      socket.off('messageEdited', handleMessageEdited);
+      socket.off('groupMessage', handleGroupMessage);
+      socket.off('groupCreated', handleGroupCreated);
+      socket.off('groupUpdated', handleGroupUpdated);
+      socket.off('groupMembersAdded', handleGroupMembersAdded);
+      socket.off('groupMemberRemoved', handleGroupMemberRemoved);
+      socket.off('removedFromGroup', handleRemovedFromGroup);
+      socket.off('groupDeleted', handleGroupDeleted);
+      socket.off('userTyping', handleUserTyping);
+      socket.off('userStoppedTyping', handleUserStoppedTyping);
+      socket.off('userOnline', handleUserOnline);
+      socket.off('userOffline', handleUserOffline);
+      socket.off('activityStatusChanged', handleActivityStatusChanged);
+      socket.off('messagesSeen', handleMessagesSeen);
+      socket.off('conversationUpdated', handleConversationUpdated);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser?._id]);

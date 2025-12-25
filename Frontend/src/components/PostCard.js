@@ -127,7 +127,13 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     setIsMusicPlaying(false);
                 });
                 audioRef.current.addEventListener('error', (e) => {
-                    console.error('Audio error:', e);
+                    const mediaError = e?.target?.error;
+                    // Non-fatal: remote previews may fail to load/parse depending on browser/network.
+                    console.warn('Audio error:', {
+                        code: mediaError?.code,
+                        message: mediaError?.message,
+                        src: e?.target?.currentSrc
+                    });
                 });
             }
             
@@ -136,7 +142,11 @@ const PostCard = ({ post, currentUser, onUpdate, onDelete }) => {
                     setIsMusicPlaying(true);
                 })
                 .catch(err => {
-                    // Auto-play prevented by browser - user needs to interact
+                    // Auto-play is often blocked until the user interacts.
+                    if (err?.name && (err.name === 'NotAllowedError' || err.name === 'AbortError')) {
+                        return;
+                    }
+                    console.warn('Audio play() failed:', err?.message || err);
                 });
         } catch (error) {
             console.error('Error in playMusic:', error);

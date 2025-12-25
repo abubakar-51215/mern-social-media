@@ -10,6 +10,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MenuIcon from '@mui/icons-material/Menu';
 import './Dashboard.css';
+import { getSocket } from '../socket';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -380,49 +381,48 @@ What's your favorite JS feature?`,
     const intervalId = setInterval(loadUnreadCount, 30000);
 
     // Listen for real-time notifications and post updates
-    const initSocket = async () => {
-      const io = (await import('socket.io-client')).default;
-      const socket = io('http://localhost:5000');
+    const socket = getSocket();
+    if (userData?._id) {
       socket.emit('join', userData._id);
+    }
 
-      socket.on('newNotification', (data) => {
-        // Reload notifications when a new one arrives
-        loadNotifications();
-        loadUnreadCount();
-      });
-
-      // Real-time post updates
-      socket.on('postLiked', (data) => {
-        setPosts(prevPosts => prevPosts.map(post => 
-          post._id === data.postId 
-            ? { ...post, likes: data.likes, likesCount: data.likesCount }
-            : post
-        ));
-      });
-
-      socket.on('postCommented', (data) => {
-        setPosts(prevPosts => prevPosts.map(post => 
-          post._id === data.postId 
-            ? { ...post, comments: data.comments, commentsCount: data.commentsCount }
-            : post
-        ));
-      });
-
-      socket.on('newPost', (data) => {
-        // Add new post to the feed
-        setPosts(prevPosts => [data.post, ...prevPosts]);
-      });
-
-      return () => {
-        socket.disconnect();
-      };
+    const handleNewNotification = () => {
+      loadNotifications();
+      loadUnreadCount();
     };
 
-    initSocket();
+    const handlePostLiked = (data) => {
+      setPosts(prevPosts => prevPosts.map(post =>
+        post._id === data.postId
+          ? { ...post, likes: data.likes, likesCount: data.likesCount }
+          : post
+      ));
+    };
+
+    const handlePostCommented = (data) => {
+      setPosts(prevPosts => prevPosts.map(post =>
+        post._id === data.postId
+          ? { ...post, comments: data.comments, commentsCount: data.commentsCount }
+          : post
+      ));
+    };
+
+    const handleNewPost = (data) => {
+      setPosts(prevPosts => [data.post, ...prevPosts]);
+    };
+
+    socket.on('newNotification', handleNewNotification);
+    socket.on('postLiked', handlePostLiked);
+    socket.on('postCommented', handlePostCommented);
+    socket.on('newPost', handleNewPost);
 
     // Cleanup interval on unmount
     return () => {
       clearInterval(intervalId);
+      socket.off('newNotification', handleNewNotification);
+      socket.off('postLiked', handlePostLiked);
+      socket.off('postCommented', handlePostCommented);
+      socket.off('newPost', handleNewPost);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);

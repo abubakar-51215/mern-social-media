@@ -44,11 +44,16 @@ export const loginUser = async (req, res) => {
     const userAgent = req.headers['user-agent'] || 'Unknown';
     const ip = req.ip || req.connection.remoteAddress || 'Unknown';
 
-    const user = await User.findOne({ email });
+    const normalizedEmail = (email || '').toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+    if (!password || !user.password) {
+      return res.status(400).json({ message: "Invalid email or password" });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
     const token = jwt.sign(
       { id: user._id },

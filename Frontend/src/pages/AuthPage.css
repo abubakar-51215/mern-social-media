@@ -173,7 +173,6 @@ body, html, #root {
 
 .auth-form-container {
   width: 100%;
-  max-height: 85vh;
   overflow-y: auto;
   background: #fff;
   border-radius: 14px;

@@ -117,10 +117,14 @@ const AuthPage = () => {
                 } else {
                     // Regular user login
                     result = await loginUser({ email: formData.email, password: formData.password });
-                    setAuth(result.token, result.user);
+                    const { token, user } = result.data || {};
+                    if (!token || !user) {
+                        throw new Error('Login response missing token/user');
+                    }
+                    setAuth(token, user);
                     
                     // Check if user has admin role from backend
-                    if (result.user.role === 'admin') {
+                    if (user.role === 'admin') {
                         history.push('/admin/dashboard');
                     } else {
                         history.push('/dashboard');
