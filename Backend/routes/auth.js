@@ -19,7 +19,7 @@ router.get('/google',
 );
 
 router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: ${getClientUrl()}?error=auth_failed }),
+    passport.authenticate('google', { failureRedirect: `${getClientUrl()}?error=auth_failed` }),
     (req, res) => {
         const token = jwt.sign(
             { id: req.user._id },
@@ -27,7 +27,7 @@ router.get('/google/callback',
             { expiresIn: '7d' }
         );
         const clientUrl = getClientUrl();
-        res.redirect(${clientUrl}?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))});
+        res.redirect(`${clientUrl}?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`);
     }
 );
 
