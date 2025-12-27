@@ -28,7 +28,7 @@ const AuthPage = () => {
     const [success, setSuccess] = useState('');
     const history = useHistory();
 
-    const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+    const apiBaseUrl = (window.ENV && window.ENV.REACT_APP_API_URL) || process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
     useEffect(() => {
         // Fetch platform settings
