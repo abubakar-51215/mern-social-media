@@ -71,7 +71,7 @@ const AuthPage = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
+        
         // Validate passwords match for signup
         if (!isLogin) {
             if (formData.password !== formData.confirmPassword) {
@@ -83,23 +83,23 @@ const AuthPage = () => {
                 return;
             }
         }
-
+        
         try {
             let result;
             if (isLogin) {
                 // Hardcoded Admin Credentials Check
                 const ADMIN_EMAIL = 'admin@pingup.com';
                 const ADMIN_PASSWORD = 'Admin@123';
-
+                
                 // Trim the input values
                 const enteredEmail = formData.email.trim().toLowerCase();
                 const enteredPassword = formData.password.trim();
-
+                
                 console.log('Login attempt:', { enteredEmail, passwordLength: enteredPassword.length });
                 console.log('Comparing with admin:', { ADMIN_EMAIL, ADMIN_PASSWORD });
                 console.log('Email match:', enteredEmail === ADMIN_EMAIL.toLowerCase());
                 console.log('Password match:', enteredPassword === ADMIN_PASSWORD);
-
+                
                 if (enteredEmail === ADMIN_EMAIL.toLowerCase() && enteredPassword === ADMIN_PASSWORD) {
                     console.log('Admin login detected');
                     // Admin login
@@ -124,7 +124,7 @@ const AuthPage = () => {
                         throw new Error('Login response missing token/user');
                     }
                     setAuth(token, user);
-
+                    
                     // Check if user has admin role from backend
                     if (user.role === 'admin') {
                         history.push('/admin/dashboard');
@@ -164,8 +164,8 @@ const AuthPage = () => {
 
             <div className="auth-container">
                 <div className="auth-left">
-
-
+                    
+                    
 <div className="testimonial">
     <div className="user-avatars">
         <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="User 1" />
@@ -230,7 +230,7 @@ const AuthPage = () => {
                                     />
                                 </div>
                             )}
-
+                            
                             <div className="form-group">
                                 <label>Email address</label>
                                 <input
@@ -325,7 +325,7 @@ const AuthPage = () => {
                 <div className="forgot-password-modal-overlay" onClick={() => setShowForgotPassword(false)}>
                     <div className="forgot-password-modal" onClick={(e) => e.stopPropagation()}>
                         <button className="close-modal" onClick={() => setShowForgotPassword(false)}>×</button>
-
+                        
                         {forgotPasswordStep === 'email' && (
                             <>
                                 <h3>Forgot Password</h3>
@@ -346,9 +346,9 @@ const AuthPage = () => {
                                             alert('Please enter an email to send an OTP');
                                             return;
                                         }
-
+                                        
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+                                            const response = await fetch(`${apiBaseUrl}/auth/forgot-password`, {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail })
@@ -388,7 +388,7 @@ const AuthPage = () => {
                                     className="continue-btn"
                                     onClick={async () => {
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                                            const response = await fetch(`${apiBaseUrl}/auth/verify-otp`, {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail, otp })
@@ -442,7 +442,7 @@ const AuthPage = () => {
                                     className="continue-btn"
                                     onClick={async () => {
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+                                            const response = await fetch(`${apiBaseUrl}/auth/reset-password`, {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail, otp, newPassword })
