@@ -346,7 +346,7 @@ const AuthPage = () => {
                                         }
                                         
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+                                            const response = await fetch('https://api.talhasghar.site/api/auth/forgot-password', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail })
@@ -386,7 +386,7 @@ const AuthPage = () => {
                                     className="continue-btn"
                                     onClick={async () => {
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+                                            const response = await fetch('https://api.talhasghar.site/api/auth/verify-otp', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail, otp })
@@ -440,7 +440,7 @@ const AuthPage = () => {
                                     className="continue-btn"
                                     onClick={async () => {
                                         try {
-                                            const response = await fetch('http://localhost:5000/api/auth/reset-password', {
+                                            const response = await fetch('https://api.talhasghar.site/api/auth/reset-password', {
                                                 method: 'POST',
                                                 headers: { 'Content-Type': 'application/json' },
                                                 body: JSON.stringify({ email: forgotEmail, otp, newPassword })
