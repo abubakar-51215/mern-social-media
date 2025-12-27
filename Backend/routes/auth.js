@@ -5,6 +5,8 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
+const getClientUrl = () => process.env.CLIENT_URL || 'http://localhost:3000';
+
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/forgot-password", forgotPassword);
@@ -17,14 +19,15 @@ router.get('/google',
 );
 
 router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: 'http://localhost:3000?error=auth_failed' }),
+    passport.authenticate('google', { failureRedirect: ${getClientUrl()}?error=auth_failed }),
     (req, res) => {
         const token = jwt.sign(
             { id: req.user._id },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
-        res.redirect(`http://localhost:3000?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`);
+        const clientUrl = getClientUrl();
+        res.redirect(${clientUrl}?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))});
     }
 );
 
