@@ -193,7 +193,7 @@ const AuthPage = () => {
                             <p>{isLogin ? 'Welcome back! Please sign in to continue' : platformInfo.platformDescription}</p>
                         </div>
 
-                        <button className="google-btn" onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'}>
+                        <button className="google-btn" onClick={() => window.location.href = 'https://talhasghar.site/api/auth/google'}>
                             <img src={`${process.env.PUBLIC_URL}/google_logo.webp`} alt="Google" className="google-icon" width="18" height="18" />
                             <span>Continue with Google</span>
                         </button>
