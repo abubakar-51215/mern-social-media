@@ -69,7 +69,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/set-password', {
+            const response = await fetch('https://talhasghar.site/api/users/set-password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/delete-account', {
+            const response = await fetch('https://talhasghar.site/api/users/delete-account', {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -149,7 +149,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
                 formData.append('profilePicture', profileImage);
             }
 
-            const response = await fetch('http://localhost:5000/api/users/update-profile', {
+            const response = await fetch('https://talhasghar.site/api/users/update-profile', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -176,7 +176,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
     const handleRemoveConnectedAccount = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/remove-google-account', {
+            const response = await fetch('https://talhasghar.site/api/users/remove-google-account', {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -210,7 +210,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/send-verification-code', {
+            const response = await fetch('https://talhasghar.site/api/users/send-verification-code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/verify-email', {
+            const response = await fetch('https://talhasghar.site/api/users/verify-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -298,7 +298,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
     const handleResendCode = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/send-verification-code', {
+            const response = await fetch('https://talhasghar.site/api/users/send-verification-code', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -321,7 +321,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
         console.log('Setting primary email to:', emailAddress);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/set-primary-email', {
+            const response = await fetch('https://talhasghar.site/api/users/set-primary-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
         console.log('Removing email:', emailAddress);
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/users/remove-email', {
+            const response = await fetch('https://talhasghar.site/api/users/remove-email', {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -627,7 +627,7 @@ const ManageAccount = ({ isOpen, onClose }) => {
                             <div style={{ position: 'absolute', top: '-18px', left: '0', zIndex: 2 }}>
                                 <div className="profile-avatar-large" style={{ boxShadow: '0 4px 16px rgba(99,102,241,0.18), 0 1.5px 6px rgba(0,0,0,0.08)', border: '4px solid #fff' }}>
                                     {profileImagePreview || user?.profilePicture ? (
-                                        <img src={profileImagePreview || (user.profilePicture && user.profilePicture.startsWith('/uploads') ? `http://localhost:5000${user.profilePicture}` : user.profilePicture)} alt="Profile" />
+                                        <img src={profileImagePreview || (user.profilePicture && user.profilePicture.startsWith('/uploads') ? `https://talhasghar.site${user.profilePicture}` : user.profilePicture)} alt="Profile" />
                                     ) : (
                                         <div className="avatar-placeholder-large" style={{ fontWeight: '700', fontSize: '22px' }}>
                                             {user?.name?.charAt(0).toUpperCase() || 'A'}
